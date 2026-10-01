@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'shared/login_font_style.dart';
 import 'shared/form_input.dart';
-import 'shared/form_button.dart';
+import 'shared/green_button.dart';
+import 'cadastro.dart';
+import 'shared/validacoes_login_cadastro.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -12,28 +14,6 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final chaveFormulario = GlobalKey<FormState>();
-
-  String? validarEmail(String? valor) {
-    final email = (valor ?? '').trim();
-
-    if (email.isEmpty) {
-      return 'Digite seu e-mail';
-    }
-
-    if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)) {
-      return 'Digite um e-mail válido';
-    }
-
-    return null;
-  }
-
-  String? validarSenha(String? valor) {
-    if (valor == null || valor.trim().isEmpty) {
-      return 'Digite sua senha';
-    }
-
-    return null;
-  }
 
   void entrar() {
     if (!chaveFormulario.currentState!.validate()) {
@@ -80,11 +60,15 @@ class _LoginState extends State<Login> {
         ),
         const SizedBox(height: 22),
 
-        FormButton('Entrar', onPressed: entrar),
+        GreenButton('Entrar', onPressed: entrar),
         const SizedBox(height: 22),
 
         GestureDetector(
           onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Cadastro()),
+            );
           },
           child: Center(
             child:

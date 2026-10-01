@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class FormButton extends StatelessWidget {
-  const FormButton(this.text, {super.key, required this.onPressed});
+class GreenButton extends StatelessWidget {
+  const GreenButton(this.text, {super.key, required this.onPressed});
 
   final String text;
   final VoidCallback onPressed;
