@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'shared/login_font_style.dart';
-import 'shared/form_input.dart';
-import 'shared/green_button.dart';
+import '../shared/formulario/estilo_fonte_login.dart';
+import '../shared/formulario/campo_formulario.dart';
+import '../shared/botões/botao_verde.dart';
 import 'cadastro.dart';
-import 'shared/validacoes_login_cadastro.dart';
+import '../shared/formulario/validacoes_login_cadastro.dart';
+import '../inicio.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -23,6 +24,11 @@ class _LoginState extends State<Login> {
     // Coloque a autenticação aqui quando conectar o login.
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Campos válidos!')),
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const Inicio()),
     );
   }
 
