@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'shared/login_font_style.dart';
-import 'shared/form_input.dart';
-import 'shared/green_button.dart';
-import 'shared/validacoes_login_cadastro.dart';
+import '../shared/formulario/estilo_fonte_login.dart';
+import '../shared/formulario/campo_formulario.dart';
+import '../shared/botões/botao_verde.dart';
+import '../shared/formulario/validacoes_login_cadastro.dart';
 
 class Cadastro extends StatefulWidget {
   const Cadastro({super.key});
