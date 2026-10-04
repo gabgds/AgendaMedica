@@ -9,7 +9,8 @@ class NovoAgendamento {
   });
 
   final int pacienteId;
-  final int clinicaId;
+  // null indica uma consulta avulsa, sem vínculo com clínica.
+  final int? clinicaId;
   final DateTime dataHora;
   final int duracaoMinutos;
 }

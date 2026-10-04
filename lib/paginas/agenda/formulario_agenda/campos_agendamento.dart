@@ -45,7 +45,13 @@ class CamposAgendamento extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 28),
-        seletor('CLÍNICA', clinicas, clinicaId, aoSelecionarClinica),
+        seletor(
+          'CLÍNICA',
+          // O valor 0 identifica Avulso somente no seletor, sem criar uma clínica.
+          {0: 'Avulso', ...clinicas},
+          clinicaId,
+          aoSelecionarClinica,
+        ),
         const SizedBox(height: 28),
         campoDuracao(),
       ],

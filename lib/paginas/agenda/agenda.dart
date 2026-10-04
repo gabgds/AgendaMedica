@@ -5,6 +5,9 @@ import 'card_atendimento.dart';
 import 'dados_agenda_teste.dart';
 import 'seletor_dias.dart';
 
+import './formulario_agenda/modal_agendamento.dart';
+import './formulario_agenda/dados_agendamento_teste.dart';
+
 class Agenda extends StatefulWidget {
   const Agenda({super.key});
 
@@ -29,10 +32,22 @@ class _AgendaState extends State<Agenda> {
     });
   }
 
-  void adicionarAtendimento() {
+  Future<void> adicionarAtendimento() async {
     // Coloque a navegação para o formulário de agendamento aqui.
+    final consulta = await abrirModalAgendamento(
+      context,
+      dataInicial: dataSelecionada,
+      pacientes: pacientesAgendamentoTeste,
+      clinicas: clinicasAgendamentoTeste,
+    );
+
+    if (!mounted || consulta == null) return;
+
+    // Coloque a gravação no banco aqui usando os dados de consulta.
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Cadastro de atendimento em construção')),
+      const SnackBar(
+        content: Text('Dados da consulta preenchidos'),
+      ),
     );
   }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../shared/botões/botao_verde.dart';
-import '../../shared/formulario/modal_formulario.dart';
+import '../../../shared/botões/botao_verde.dart';
+import '../../../shared/formulario/modal_formulario.dart';
 import 'campos_agendamento.dart';
 import 'novo_agendamento.dart';
 
@@ -117,7 +117,8 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
 
     Navigator.pop(context, NovoAgendamento(
       pacienteId: pacienteId!,
-      clinicaId: clinicaId!,
+      // Converte a opção Avulso do seletor em ausência de vínculo com clínica.
+      clinicaId: clinicaId == 0 ? null : clinicaId,
       dataHora: DateTime(
         dataSelecionada.year, dataSelecionada.month, dataSelecionada.day,
         horario.hour, horario.minute,
