@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../shared/estilo/estilo_texto.dart';
-import '../../shared/atendimento/atendimento.dart';
+import 'package:pex/shared/atendimento/atendimento.dart';
+import 'package:pex/shared/atendimento/modal_atendimento.dart';
+import 'package:pex/shared/atendimento/dados_em_memoria.dart';
 import 'card_atendimento.dart';
 import 'dados_agenda_teste.dart';
 import 'seletor_dias.dart';
-
 import './formulario_agenda/modal_agendamento.dart';
 import './formulario_agenda/dados_agendamento_teste.dart';
 
@@ -43,25 +44,31 @@ class _AgendaState extends State<Agenda> {
 
     if (!mounted || consulta == null) return;
 
-    // Coloque a gravação no banco aqui usando os dados de consulta.
+    adicionarAtendimentoEmMemoria(
+      pacienteId: consulta.pacienteId,
+      clinicaId: consulta.clinicaId,
+      nomePaciente: pacientesAgendamentoTeste[consulta.pacienteId]!,
+      nomeClinica: consulta.clinicaId == null
+          ? ''
+          : clinicasAgendamentoTeste[consulta.clinicaId]!,
+      dataHora: consulta.dataHora,
+      duracaoMinutos: consulta.duracaoMinutos,
+    );
+
+    selecionarData(consulta.dataHora);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Dados da consulta preenchidos'),
-      ),
+      const SnackBar(content: Text('Consulta agendada')),
     );
   }
 
   void abrirAtendimento(Atendimento atendimento) {
     // O futuro modal pode receber atendimento ou consultar atendimento.id.
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Atendimento #${atendimento.id} de ${atendimento.nomePaciente}'),
-      ),
-    );
+    abrirModalAtendimento(context, atendimento: atendimento);
   }
 
   @override
   Widget build(BuildContext context) {
+    // O Scaffold, a SafeArea e a barra inferior já estão no Inicio.
     return ColoredBox(
       color: const Color(0xFFF8F9FD),
       child: Column(

@@ -5,7 +5,8 @@ import 'contador_resumo.dart';
 import 'card_proximo_atendimento.dart';
 import 'dados_para_teste.dart';
 import 'item_atendimento.dart';
-import '../../shared/atendimento/atendimento.dart';
+import 'package:pex/shared/atendimento/atendimento.dart';
+import 'package:pex/shared/atendimento/modal_atendimento.dart';
 
 class ConteudoInicio extends StatefulWidget {
   const ConteudoInicio({super.key});
@@ -26,8 +27,8 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
   criarStreamProximoAtendimento();
 
 
-  late final streamAgenda = Stream<List<Atendimento>>.value(
-    atendimentosHoje(),
+  late final streamAgenda = criarStreamAgendaHoje(
+    // Agora recebemos objetos Atendimento e montamos os widgets no builder.
     // cria uma lista de atendimentos
     // [
     // ItemAtendimento(...),
@@ -37,13 +38,7 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
 
   void abrirAtendimento(Atendimento atendimento) {
     // O futuro modal pode receber atendimento ou consultar atendimento.id.
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Atendimento #${atendimento.id} de ${atendimento.nomePaciente}',
-        ),
-      ),
-    );
+    abrirModalAtendimento(context, atendimento: atendimento);
   }
 
   // Os snapshots são as informações mais recentes nas variáveis stream

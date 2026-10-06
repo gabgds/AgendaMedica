@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../shared/formulario/estilo_fonte_login.dart';
 import '../shared/formulario/campo_formulario.dart';
-import '../shared/botões/botao_verde.dart';
+import '../shared/botões/botao.dart';
 import 'cadastro.dart';
 import '../shared/formulario/validacoes_login_cadastro.dart';
 import 'inicio.dart';
@@ -66,7 +66,7 @@ class _LoginState extends State<Login> {
         ),
         const SizedBox(height: 22),
 
-        GreenButton('Entrar', onPressed: entrar),
+        Button('Entrar', onPressed: entrar),
         const SizedBox(height: 22),
 
         GestureDetector(

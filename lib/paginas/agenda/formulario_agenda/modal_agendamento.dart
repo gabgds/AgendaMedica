@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../shared/botões/botao_verde.dart';
+import '../../../shared/botões/botao.dart';
 import '../../../shared/formulario/modal_formulario.dart';
 import 'campos_agendamento.dart';
 import 'novo_agendamento.dart';
@@ -135,7 +135,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
       conteudo: formulario(),
       rodape: SizedBox(
         height: 50,
-        child: GreenButton('Agendar consulta', onPressed: agendar),
+        child: Button('Agendar consulta', onPressed: agendar),
       ),
     );
   }

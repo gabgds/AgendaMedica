@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../shared/formulario/estilo_fonte_login.dart';
 import '../shared/formulario/campo_formulario.dart';
-import '../shared/botões/botao_verde.dart';
+import '../shared/botões/botao.dart';
 import '../shared/formulario/validacoes_login_cadastro.dart';
 
 class Cadastro extends StatefulWidget {
@@ -93,7 +93,7 @@ class _CadastroState extends State<Cadastro> {
           }
         ),
         const SizedBox(height: 26),
-        GreenButton('Criar conta', onPressed: cadastrar),
+        Button('Criar conta', onPressed: cadastrar),
       ],
     );
   }

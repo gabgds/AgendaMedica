@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../shared/estilo/estilo_texto.dart';
 import '../../shared/funcoes/obter_iniciais.dart';
 import '../../shared/funcoes/gerar_cor_avatar.dart';
-import '../../shared/atendimento/atendimento.dart';
+import 'package:pex/shared/atendimento/atendimento.dart';
 
 class CardAtendimento extends StatelessWidget {
   const CardAtendimento({
@@ -14,9 +14,6 @@ class CardAtendimento extends StatelessWidget {
   final Atendimento atendimento;
   final VoidCallback onTap;
 
-  static final Color cinza = Colors.grey[700]!;
-
-  // O card junta avatar() e informacoes() numa row
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -44,7 +41,6 @@ class CardAtendimento extends StatelessWidget {
     );
   }
 
-  // ícone com as iniciais
   Widget avatar() {
     return Container(
       width: 48,
@@ -63,7 +59,6 @@ class CardAtendimento extends StatelessWidget {
     );
   }
 
-  // coluna de informações do atendimento
   Widget informacoes() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,7 +66,6 @@ class CardAtendimento extends StatelessWidget {
         Wrap(
           spacing: 10,
           crossAxisAlignment: WrapCrossAlignment.center,
-          // primeira linha, horário e nome
           children: [
             TextoComEstilo(
               atendimento.horario,
@@ -88,17 +82,15 @@ class CardAtendimento extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        // segunda linha, local
-        TextoComEstilo(atendimento.local, cor: cinza, tamanho: 14),
+        TextoComEstilo(atendimento.local, cor: Colors.grey, tamanho: 14),
         const SizedBox(height: 10),
         Wrap(
           spacing: 4,
           runSpacing: 4,
           crossAxisAlignment: WrapCrossAlignment.center,
-          // terceira linha, etiqueta e minutos
           children: [
             etiqueta(),
-            TextoComEstilo('${atendimento.duracaoMinutos} min', cor: cinza, tamanho: 12),
+            TextoComEstilo('${atendimento.duracaoMinutos} min', cor: Colors.grey, tamanho: 12),
           ],
         ),
       ],
@@ -106,15 +98,17 @@ class CardAtendimento extends StatelessWidget {
   }
 
   Widget etiqueta() {
+    final concluido = atendimento.status == 'Concluído';
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFE1EEFC),
+        color: concluido ? const Color(0xFFE0F3EC) : const Color(0xFFE1EEFC),
         borderRadius: BorderRadius.circular(20),
       ),
       child: TextoComEstilo(
         atendimento.status,
-        cor: const Color(0xFF007AFF),
+        cor: concluido ? const Color(0xFF00866A) : const Color(0xFF007AFF),
         tamanho: 10,
         peso: FontWeight.bold,
       ),

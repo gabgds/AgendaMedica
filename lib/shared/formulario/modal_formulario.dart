@@ -27,11 +27,13 @@ class ModalFormulario extends StatelessWidget {
     required this.titulo,
     required this.conteudo,
     this.rodape,
+    this.cabecalhoPersonalizado,
   });
 
   final String titulo;
   final Widget conteudo;
   final Widget? rodape;
+  final Widget? cabecalhoPersonalizado;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +44,7 @@ class ModalFormulario extends StatelessWidget {
         height: MediaQuery.of(context).size.height * 0.94,
         child: Column(
           children: [
-            cabecalho(context),
+            cabecalhoPersonalizado ?? cabecalho(context),
             const Divider(height: 1, color: Color(0xFFEAEAEA)),
             Expanded(child: corpo()),
             if (rodape != null) ...[
