@@ -2,57 +2,82 @@
 // do inicio. Desse jeito eu separei as informações específicas da apresentação
 // delas com os widgets. O banco de dados que vai substituir isso. - Gustavo
 
-import 'package:flutter/material.dart';
-import 'item_atendimento.dart';
+import '../../shared/atendimento/atendimento.dart';
+
+// IDs fictícios. Quando conectar o banco, usar os IDs dos registros.
+final _hoje = DateTime.now();
+final _atendimentos = [
+  Atendimento(
+    id: 1,
+    pacienteId: 1,
+    clinicaId: 1,
+    nomePaciente: 'Ana Carolina',
+    nomeClinica: 'Clínica Saúde',
+    dataHora: DateTime(_hoje.year, _hoje.month, _hoje.day, 10),
+    sala: '3',
+    duracaoMinutos: 60,
+    status: 'Concluído',
+  ),
+  Atendimento(
+    id: 2,
+    pacienteId: 2,
+    clinicaId: 1,
+    nomePaciente: 'Maria Silva',
+    nomeClinica: 'Clínica Saúde',
+    dataHora: DateTime(_hoje.year, _hoje.month, _hoje.day, 14),
+    sala: '3',
+    duracaoMinutos: 60,
+    status: 'Agendado',
+  ),
+  Atendimento(
+    id: 3,
+    pacienteId: 3,
+    clinicaId: 2,
+    nomePaciente: 'João Pedro',
+    nomeClinica: 'Clínica Multicare',
+    dataHora: DateTime(_hoje.year, _hoje.month, _hoje.day, 16),
+    sala: '2',
+    duracaoMinutos: 60,
+    status: 'Agendado',
+  ),
+];
 
 // Dados para os contadores
 Stream<Map<String, int>> criarStreamContadores() {
+  final atendimentos = atendimentosHoje();
+  final concluidos = atendimentos.where((atendimento) {
+    return atendimento.status == 'Concluído';
+  }).length;
+
   return Stream.value({
-    'hoje': 3,
-    'concluidos': 1,
+    'hoje': atendimentos.length,
+    'concluidos': concluidos,
   });
 }
 
 // Dados para o card de próximo atendimento
-Stream<Map<String, String>?> criarStreamProximoAtendimento() {
-  return Stream<Map<String, String>?>.value({
-    'horario': '14:00',
-    'paciente': 'Maria Silva',
-    'local': 'Clínica Saúde - Sala 3',
-    'descricao': 'Consulta - 60 min',
-  });
+Stream<Atendimento?> criarStreamProximoAtendimento() {
+  // Mostra o primeiro agendado do dia, inclusive se estiver atrasado.
+  // atendimentosHoje() já entrega a lista em ordem de horário.
+  for (final atendimento in atendimentosHoje()) {
+    if (atendimento.status == 'Agendado') {
+      return Stream<Atendimento?>.value(atendimento);
+    }
+  }
+
+  return Stream<Atendimento?>.value(null);
 }
 
 // dados para a lista da agenda de hoje
-List<Widget> atendimentosHoje() {
-  return [
-    ItemAtendimento(
-      nome: 'Ana Carolina',
-      horario: '10:00',
-      local: 'Clínica Saúde - Sala 3',
-      concluido: true,
-      onTap: () {},
-    ),
-    ItemAtendimento(
-      nome: 'Maria Silva',
-      horario: '14:00',
-      local: 'Clínica Saúde - Sala 3',
-      concluido: false,
-      onTap: () {},
-    ),
-    ItemAtendimento(
-      nome: 'João Pedro',
-      horario: '16:00',
-      local: 'Clínica Multicare - Sala 2',
-      concluido: false,
-      onTap: () {},
-    ),
-    ItemAtendimento(
-      nome: 'João Pedro',
-      horario: '16:00',
-      local: 'Clínica Multicare - Sala 2',
-      concluido: false,
-      onTap: () {},
-    ),
-  ];
+List<Atendimento> atendimentosHoje() {
+  final hoje = DateTime.now();
+  final atendimentos = _atendimentos.where((atendimento) {
+    final data = atendimento.dataHora;
+    return data.year == hoje.year &&
+        data.month == hoje.month &&
+        data.day == hoje.day;
+  }).toList();
+
+  atendimentos.sort((a, b) => a.dataHora.compareTo(b.dataHora));
+  return atendimentos;
 }

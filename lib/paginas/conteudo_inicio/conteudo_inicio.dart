@@ -4,6 +4,8 @@ import 'card_agenda.dart';
 import 'contador_resumo.dart';
 import 'card_proximo_atendimento.dart';
 import 'dados_para_teste.dart';
+import 'item_atendimento.dart';
+import '../../shared/atendimento/atendimento.dart';
 
 class ConteudoInicio extends StatefulWidget {
   const ConteudoInicio({super.key});
@@ -24,7 +26,7 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
   criarStreamProximoAtendimento();
 
 
-  late final streamAgenda = Stream<List<Widget>>.value(
+  late final streamAgenda = Stream<List<Atendimento>>.value(
     atendimentosHoje(),
     // cria uma lista de atendimentos
     // [
@@ -32,6 +34,17 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
     // ItemAtendimento(...),
     // ]
   );
+
+  void abrirAtendimento(Atendimento atendimento) {
+    // O futuro modal pode receber atendimento ou consultar atendimento.id.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Atendimento #${atendimento.id} de ${atendimento.nomePaciente}',
+        ),
+      ),
+    );
+  }
 
   // Os snapshots são as informações mais recentes nas variáveis stream
 
@@ -145,7 +158,7 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
   Widget proximoAtendimento() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-      child: StreamBuilder<Map<String, String>?>(
+      child: StreamBuilder<Atendimento?>(
         stream: streamProximoAtendimento,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -165,11 +178,8 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
           }
 
           return CardProximoAtendimento(
-            horario: atendimento['horario']!,
-            paciente: atendimento['paciente']!,
-            local: atendimento['local']!,
-            descricao: atendimento['descricao']!,
-            onTap: () {},
+            atendimento: atendimento,
+            onTap: () => abrirAtendimento(atendimento),
           );
         },
       ),
@@ -178,7 +188,7 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
 
   // Lista dos atendimentos do dia
   Widget agendaHoje() {
-    return StreamBuilder<List<Widget>>(
+    return StreamBuilder<List<Atendimento>>(
       stream: streamAgenda,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -206,7 +216,13 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
           padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
           child: CardAgenda(
             data: dataAtual(),
-            atendimentos: snapshot.data!,
+            atendimentos: [
+              for (final atendimento in atendimentos)
+                ItemAtendimento(
+                  atendimento: atendimento,
+                  onTap: () => abrirAtendimento(atendimento),
+                ),
+            ],
           ),
         );
       },
