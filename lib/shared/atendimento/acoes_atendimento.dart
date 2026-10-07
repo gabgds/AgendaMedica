@@ -3,10 +3,14 @@ import 'package:pex/shared/botões/botao.dart';
 
 // Rodapé visual do modal. As ações serão implementadas posteriormente.
 class AcoesAtendimento extends StatelessWidget {
-  const AcoesAtendimento({super.key});
+  const AcoesAtendimento({super.key, this.concluido = false});
+
+  final bool concluido;
 
   @override
   Widget build(BuildContext context) {
+    if (concluido) return botaoFechar(context);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -24,6 +28,20 @@ class AcoesAtendimento extends StatelessWidget {
         const SizedBox(height: 8),
         botaoCancelar(),
       ],
+    );
+  }
+
+  Widget botaoFechar(BuildContext context) {
+    return SizedBox(
+      height: 46,
+      child: Button(
+        'Fechar',
+        cor: const Color(0xFFCFCFCF),
+        corTexto: Colors.black,
+        pesoTexto: FontWeight.normal,
+        padding: EdgeInsets.zero,
+        onPressed: () => Navigator.pop(context),
+      ),
     );
   }
 

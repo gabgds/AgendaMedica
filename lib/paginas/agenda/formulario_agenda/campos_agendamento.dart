@@ -86,7 +86,7 @@ class CamposAgendamento extends StatelessWidget {
     ValueChanged<int?> aoSelecionar,
   ) {
     return DropdownButtonFormField<int>(
-      value: selecionado,
+      initialValue: selecionado,
       isExpanded: true,
       decoration: decoracao(titulo),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),

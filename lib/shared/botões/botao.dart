@@ -6,12 +6,16 @@ class Button extends StatelessWidget {
     super.key,
     required this.onPressed,
     this.cor = const Color(0xFF1B8780),
+    this.corTexto = Colors.white,
+    this.pesoTexto = FontWeight.bold,
     this.padding = const EdgeInsets.symmetric(vertical: 22),
   });
 
   final String text;
   final VoidCallback onPressed;
   final Color cor;
+  final Color corTexto;
+  final FontWeight pesoTexto;
   final EdgeInsetsGeometry padding;
 
   @override
@@ -22,11 +26,11 @@ class Button extends StatelessWidget {
         onPressed: onPressed,
         style: FilledButton.styleFrom(
           backgroundColor: cor,
-          foregroundColor: Colors.white,
+          foregroundColor: corTexto,
           padding: padding,
-          textStyle: const TextStyle(
+          textStyle: TextStyle(
             fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontWeight: pesoTexto,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),

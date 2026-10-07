@@ -40,7 +40,7 @@ class ModalAtendimento extends StatelessWidget {
         atendimento: atendimento,
         telefonePaciente: telefonePaciente,
       ),
-      rodape: const AcoesAtendimento(),
+      rodape: AcoesAtendimento(concluido: atendimento.status == 'Concluído'),
     );
   }
 }
