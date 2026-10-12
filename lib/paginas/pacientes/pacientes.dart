@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 import 'package:pex/shared/paciente/paciente.dart';
+import 'package:pex/shared/paciente/dados_pacientes_em_memoria.dart';
+import '../agenda/formulario_agenda/dados_agendamento_teste.dart';
 import 'cabecalho_pacientes.dart';
 import 'card_paciente.dart';
 import 'dados_pacientes_teste.dart';
+import 'formulario_paciente/modal_paciente.dart';
+import 'perfil_paciente/modal_perfil_paciente.dart';
 
 // Conteúdo da aba Pacientes. O Scaffold e a navegação ficam em Inicio.
 class Pacientes extends StatefulWidget {
   const Pacientes({
     super.key,
     this.pacientes = pacientesTeste,
+    this.clinicas = clinicasAgendamentoTeste,
     this.aoAdicionar,
     this.aoAbrirPaciente,
+    this.aoAbrirNotasFiscais,
   });
 
   final List<Paciente> pacientes;
+  final Map<int, String> clinicas;
   final VoidCallback? aoAdicionar;
   final ValueChanged<Paciente>? aoAbrirPaciente;
+  final ValueChanged<Paciente>? aoAbrirNotasFiscais;
 
   @override
   State<Pacientes> createState() => _PacientesState();
@@ -24,6 +32,54 @@ class Pacientes extends StatefulWidget {
 
 class _PacientesState extends State<Pacientes> {
   String busca = '';
+  bool cadastroAberto = false;
+  bool perfilAberto = false;
+
+  Future<void> adicionarPaciente() async {
+    // Mantém a possibilidade de o chamador fornecer sua própria ação.
+    if (widget.aoAdicionar != null) {
+      widget.aoAdicionar!();
+      return;
+    }
+    if (cadastroAberto) return;
+    cadastroAberto = true;
+
+    try {
+      final novo = await abrirModalPaciente(context, clinicas: widget.clinicas);
+      if (!mounted || novo == null) return;
+
+      final paciente = novo.paraPaciente(
+        id: proximoIdPacienteEmMemoria(widget.pacientes),
+      );
+
+      setState(() => adicionarPacienteEmMemoria(paciente));
+    } finally {
+      cadastroAberto = false;
+    }
+  }
+
+  Future<void> abrirPaciente(Paciente paciente) async {
+    if (widget.aoAbrirPaciente != null) {
+      widget.aoAbrirPaciente!(paciente);
+      return;
+    }
+    if (perfilAberto) return;
+    perfilAberto = true;
+
+    try {
+      await abrirModalPerfilPaciente(
+        context,
+        paciente: paciente,
+        clinicas: widget.clinicas,
+        aoAbrirNotasFiscais: widget.aoAbrirNotasFiscais,
+      );
+      if (!mounted) return;
+      // Reflete na lista as edições e remoções realizadas no perfil.
+      setState(() {});
+    } finally {
+      perfilAberto = false;
+    }
+  }
 
   void buscarPaciente(String texto) {
     setState(() => busca = texto);
@@ -32,7 +88,7 @@ class _PacientesState extends State<Pacientes> {
   List<Paciente> filtrarPacientes() {
     final texto = busca.trim().toLowerCase();
 
-    return widget.pacientes.where((paciente) {
+    return pacientesEmMemoria(widget.pacientes).where((paciente) {
       return paciente.nome.toLowerCase().contains(texto) ||
           paciente.telefone.contains(texto);
     }).toList();
@@ -46,7 +102,7 @@ class _PacientesState extends State<Pacientes> {
       children: [
         CabecalhoPacientes(
           aoBuscar: buscarPaciente,
-          aoAdicionar: widget.aoAdicionar,
+          aoAdicionar: adicionarPaciente,
         ),
         const Divider(height: 1, color: Color(0xFFEAEAEA)),
         Expanded(child: conteudo(pacientes)),
@@ -92,9 +148,7 @@ class _PacientesState extends State<Pacientes> {
   Widget criarCard(Paciente paciente) {
     return CardPaciente(
       paciente: paciente,
-      aoClicar: widget.aoAbrirPaciente == null
-          ? null
-          : () => widget.aoAbrirPaciente!(paciente),
+      aoClicar: () => abrirPaciente(paciente),
     );
   }
 }

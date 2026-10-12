@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pex/modal_cadastro_paciente.dart';
 import 'database/app_database.dart';
 import 'paginas/login.dart';
 
