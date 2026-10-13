@@ -8,14 +8,16 @@ class Button extends StatelessWidget {
     this.cor = const Color(0xFF1B8780),
     this.corTexto = Colors.white,
     this.pesoTexto = FontWeight.bold,
+    this.tamanhoTexto = 18,
     this.padding = const EdgeInsets.symmetric(vertical: 22),
   });
 
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final Color cor;
   final Color corTexto;
   final FontWeight pesoTexto;
+  final double tamanhoTexto;
   final EdgeInsetsGeometry padding;
 
   @override
@@ -29,7 +31,7 @@ class Button extends StatelessWidget {
           foregroundColor: corTexto,
           padding: padding,
           textStyle: TextStyle(
-            fontSize: 18,
+            fontSize: tamanhoTexto,
             fontWeight: pesoTexto,
           ),
           shape: RoundedRectangleBorder(
