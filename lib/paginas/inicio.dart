@@ -4,6 +4,7 @@ import 'conteudo_inicio/conteudo_inicio.dart';
 import 'agenda/agenda.dart';
 import 'pacientes/pacientes.dart';
 import 'clinicas/clinicas.dart';
+import 'opcoes/opcoes.dart';
 
 class Inicio extends StatefulWidget {
   const Inicio({super.key});
@@ -33,6 +34,9 @@ class _InicioState extends State<Inicio> {
     }
     else if (indiceAtual == 3){
       return const Clinicas();
+    }
+    else if (indiceAtual == 4){
+      return const Opcoes();
     }
 
     return const Center(

@@ -17,6 +17,9 @@ class MinhaAgendaApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.teal,
       ),
+      routes: {
+        '/login': (context) => const TelaInicial(),
+      },
       home: const TelaInicial(),
     );
   }
