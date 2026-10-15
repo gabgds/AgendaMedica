@@ -79,6 +79,46 @@ Atendimento? atendimentoPorIdEmMemoria(int id) {
   return null;
 }
 
+bool atualizarAtendimentoEmMemoria({
+  required int id,
+  required int pacienteId,
+  required int? clinicaId,
+  required String nomePaciente,
+  required String nomeClinica,
+  required DateTime dataHora,
+  required int duracaoMinutos,
+  required bool emitirNotaFiscal,
+}) {
+  final indice = _atendimentos.indexWhere((item) => item.id == id);
+  if (indice == -1 || _atendimentos[indice].status != 'Agendado') return false;
+  final anterior = _atendimentos[indice];
+
+  _atendimentos[indice] = Atendimento(
+    id: anterior.id,
+    pacienteId: pacienteId,
+    clinicaId: clinicaId,
+    nomePaciente: nomePaciente,
+    nomeClinica: clinicaId == null ? '' : nomeClinica,
+    dataHora: dataHora,
+    sala: anterior.clinicaId == clinicaId ? anterior.sala : '',
+    duracaoMinutos: duracaoMinutos,
+    status: anterior.status,
+    emitirNotaFiscal: emitirNotaFiscal,
+    notaFiscalEmitida: anterior.notaFiscalEmitida,
+  );
+  _alteracoes.add(null);
+  return true;
+}
+
+bool cancelarAtendimentoEmMemoria(int id) {
+  final indice = _atendimentos.indexWhere((item) => item.id == id);
+  if (indice == -1 || _atendimentos[indice].status != 'Agendado') return false;
+
+  _atendimentos[indice] = _atendimentos[indice].copyWith(status: 'Cancelado');
+  _alteracoes.add(null);
+  return true;
+}
+
 bool concluirAtendimentoEmMemoria(int id) {
   final indice = _atendimentos.indexWhere((item) => item.id == id);
   if (indice == -1 || _atendimentos[indice].status != 'Agendado') return false;
@@ -104,7 +144,8 @@ List<Atendimento> notasFiscaisEmMemoria({
 }) {
   // Consulta todos os dias: uma nota pendente não desaparece ao virar a data.
   final notas = _atendimentos.where((atendimento) {
-    return atendimento.emitirNotaFiscal &&
+    return atendimento.status != 'Cancelado' &&
+        atendimento.emitirNotaFiscal &&
         (pacienteId == null || atendimento.pacienteId == pacienteId) &&
         (!apenasPendentes || atendimento.notaFiscalPendente);
   }).toList();
@@ -115,7 +156,8 @@ List<Atendimento> notasFiscaisEmMemoria({
 List<Atendimento> atendimentosDoDia(DateTime data) {
   final atendimentos = _atendimentos.where((atendimento) {
     final dia = atendimento.dataHora;
-    return dia.year == data.year &&
+    return atendimento.status != 'Cancelado' &&
+        dia.year == data.year &&
         dia.month == data.month &&
         dia.day == data.day;
   }).toList();
