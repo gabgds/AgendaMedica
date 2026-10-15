@@ -1,4 +1,4 @@
-import 'package:pex/shared/clinica/clinica.dart';
+import '../clinica.dart';
 
 class NovaClinica {
   const NovaClinica({

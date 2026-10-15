@@ -1,6 +1,8 @@
-import 'package:pex/shared/clinica/clinica.dart';
+// PROVISÓRIO: clínicas fictícias usadas pelas telas.
+// Substituir esta lista por clínicas carregadas do banco com Drift.
 
-// Exemplos da referência visual, até conectar os dados do banco.
+import 'clinica.dart';
+
 const clinicasTeste = <Clinica>[
   Clinica(
     id: 1,

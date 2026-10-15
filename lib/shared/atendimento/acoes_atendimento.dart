@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/botões/botao.dart';
 
-// Rodapé visual do modal. As ações serão implementadas posteriormente.
+// A conclusão atualiza o atendimento e a sua eventual pendência de nota fiscal.
 class AcoesAtendimento extends StatelessWidget {
-  const AcoesAtendimento({super.key, this.concluido = false});
+  const AcoesAtendimento({
+    super.key,
+    this.concluido = false,
+    this.aoConcluir,
+  });
 
   final bool concluido;
+  final VoidCallback? aoConcluir;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +25,7 @@ class AcoesAtendimento extends StatelessWidget {
           child: Button(
             'Marcar como concluído',
             padding: EdgeInsets.zero,
-            onPressed: () {},
+            onPressed: aoConcluir,
           ),
         ),
         const SizedBox(height: 16),

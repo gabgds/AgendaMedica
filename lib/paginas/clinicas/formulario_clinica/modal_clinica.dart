@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pex/shared/botões/botao.dart';
-import 'package:pex/shared/clinica/clinica.dart';
+import '../clinica.dart';
 import 'package:pex/shared/formulario/campo_formulario.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
 import 'package:pex/shared/formulario/validacoes_login_cadastro.dart';

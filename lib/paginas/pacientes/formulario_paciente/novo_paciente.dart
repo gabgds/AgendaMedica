@@ -1,4 +1,4 @@
-import 'package:pex/shared/paciente/paciente.dart';
+import '../paciente.dart';
 
 // Dados preenchidos no formulário. O ID é definido ao salvar o paciente.
 class NovoPaciente {
@@ -9,8 +9,6 @@ class NovoPaciente {
     required this.endereco,
     required this.email,
     required this.telefone,
-    required this.emitirNotaFiscal,
-    required this.clinicaId,
   });
 
   final String nome;
@@ -19,9 +17,6 @@ class NovoPaciente {
   final String endereco;
   final String email;
   final String telefone;
-  final bool emitirNotaFiscal;
-  // null indica a opção Avulso, como no formulário de agendamento.
-  final int? clinicaId;
 
   // A mesma conversão é usada no cadastro e na edição, preservando o ID.
   Paciente paraPaciente({required int id}) {
@@ -33,8 +28,6 @@ class NovoPaciente {
       cpf: cpf,
       endereco: endereco,
       email: email,
-      emitirNotaFiscal: emitirNotaFiscal,
-      clinicaId: clinicaId,
     );
   }
 }

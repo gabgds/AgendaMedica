@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../shared/funcoes/data_atual.dart';
+import 'data_atual.dart';
 import 'card_agenda.dart';
 import 'contador_resumo.dart';
 import 'card_proximo_atendimento.dart';
 import 'dados_para_teste.dart';
 import 'item_atendimento.dart';
+import 'aviso_notas_fiscais.dart';
 import 'package:pex/shared/atendimento/atendimento.dart';
 import 'package:pex/shared/atendimento/modal_atendimento.dart';
 
@@ -68,6 +69,7 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
               ),
             ],
           ),
+          const AvisoNotasFiscais(),
           agendaHoje(),
         ],
       ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../shared/navegacao/barra_navegacao.dart';
+import 'barra_navegacao.dart';
 import 'conteudo_inicio/conteudo_inicio.dart';
 import 'agenda/agenda.dart';
 import 'pacientes/pacientes.dart';

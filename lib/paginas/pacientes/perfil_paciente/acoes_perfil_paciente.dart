@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/botões/botao.dart';
 
-// Rodapé do perfil. A escolha feita no cadastro controla o botão de notas.
+// O botão de notas depende das consultas do paciente que solicitam emissão.
 class AcoesPerfilPaciente extends StatelessWidget {
   const AcoesPerfilPaciente({
     super.key,
-    required this.emitirNotaFiscal,
+    required this.possuiNotasFiscais,
     required this.aoAbrirNotasFiscais,
     required this.aoEditar,
     required this.aoRemover,
   });
 
-  final bool emitirNotaFiscal;
+  final bool possuiNotasFiscais;
   final VoidCallback aoAbrirNotasFiscais;
   final VoidCallback aoEditar;
   final VoidCallback aoRemover;
@@ -22,7 +22,7 @@ class AcoesPerfilPaciente extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (emitirNotaFiscal) ...[
+        if (possuiNotasFiscais) ...[
           SizedBox(
             height: 50,
             child: Button(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
-import 'package:pex/shared/paciente/paciente.dart';
+import '../paciente.dart';
 
 // Card de informações do paciente, com os dados capturados no cadastro.
 class InformacoesPerfilPaciente extends StatelessWidget {
@@ -20,7 +20,7 @@ class InformacoesPerfilPaciente extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          informacao('TELEFONE', formatarTelefone(paciente.telefone)),
+          informacao('TELEFONE', paciente.telefoneFormatado),
           const SizedBox(height: 16),
           informacao('NASCIMENTO', formatarData(paciente.dataNascimento)),
           const SizedBox(height: 16),
@@ -64,14 +64,6 @@ class InformacoesPerfilPaciente extends StatelessWidget {
     final dia = data.day.toString().padLeft(2, '0');
     final mes = data.month.toString().padLeft(2, '0');
     return '$dia/$mes/${data.year}';
-  }
-
-  String formatarTelefone(String valor) {
-    final numeros = valor.replaceAll(RegExp(r'\D'), '');
-    if (numeros.length != 10 && numeros.length != 11) return valor;
-    final ddd = numeros.substring(0, 2);
-    final corte = numeros.length - 4;
-    return '($ddd) ${numeros.substring(2, corte)}-${numeros.substring(corte)}';
   }
 
   String formatarCpf(String valor) {

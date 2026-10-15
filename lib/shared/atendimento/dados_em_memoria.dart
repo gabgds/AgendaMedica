@@ -1,9 +1,10 @@
+// PROVISÓRIO: atendimentos e notas fiscais ficam apenas na memória.
+// Os dados são perdidos ao encerrar o aplicativo.
+// Substituir por consultas e gravações no banco de dados com Drift.
+
 import 'dart:async';
 import './atendimento.dart';
 
-// Lista provisória compartilhada entre Agenda e Início.
-// Fica somente na memória e é reiniciada ao encerrar o aplicativo.
-// Isso vai ser substituído por back-end com Drift
 final _hoje = DateTime.now();
 final _atendimentos = <Atendimento>[
   Atendimento(
@@ -11,7 +12,7 @@ final _atendimentos = <Atendimento>[
     pacienteId: 1,
     clinicaId: 1,
     nomePaciente: 'Ana Carolina',
-    nomeClinica: 'Clínica Saúde',
+    nomeClinica: 'Clínica mente sã',
     dataHora: DateTime(_hoje.year, _hoje.month, _hoje.day, 10),
     sala: '3',
     duracaoMinutos: 60,
@@ -22,7 +23,7 @@ final _atendimentos = <Atendimento>[
     pacienteId: 2,
     clinicaId: 1,
     nomePaciente: 'Maria Silva',
-    nomeClinica: 'Clínica Saúde',
+    nomeClinica: 'Clínica mente sã',
     dataHora: DateTime(_hoje.year, _hoje.month, _hoje.day, 14),
     sala: '3',
     duracaoMinutos: 60,
@@ -33,7 +34,7 @@ final _atendimentos = <Atendimento>[
     pacienteId: 3,
     clinicaId: 2,
     nomePaciente: 'João Pedro',
-    nomeClinica: 'Clínica Multicare',
+    nomeClinica: 'Clínica multicare',
     dataHora: DateTime(_hoje.year, _hoje.month, _hoje.day, 16),
     sala: '2',
     duracaoMinutos: 60,
@@ -52,6 +53,7 @@ void adicionarAtendimentoEmMemoria({
   required String nomeClinica,
   required DateTime dataHora,
   required int duracaoMinutos,
+  required bool emitirNotaFiscal,
 }) {
   _atendimentos.add(Atendimento(
     id: _proximoId++,
@@ -63,10 +65,51 @@ void adicionarAtendimentoEmMemoria({
     sala: '',
     duracaoMinutos: duracaoMinutos,
     status: 'Agendado',
+    emitirNotaFiscal: emitirNotaFiscal,
   ));
 
   // Avisa os streams para atualizarem a lista, os contadores e o próximo card.
   _alteracoes.add(null);
+}
+
+Atendimento? atendimentoPorIdEmMemoria(int id) {
+  for (final atendimento in _atendimentos) {
+    if (atendimento.id == id) return atendimento;
+  }
+  return null;
+}
+
+bool concluirAtendimentoEmMemoria(int id) {
+  final indice = _atendimentos.indexWhere((item) => item.id == id);
+  if (indice == -1 || _atendimentos[indice].status != 'Agendado') return false;
+
+  _atendimentos[indice] = _atendimentos[indice].copyWith(status: 'Concluído');
+  _alteracoes.add(null);
+  return true;
+}
+
+bool marcarNotaFiscalEmitidaEmMemoria(int id) {
+  final indice = _atendimentos.indexWhere((item) => item.id == id);
+  if (indice == -1 || !_atendimentos[indice].notaFiscalPendente) return false;
+
+  _atendimentos[indice] =
+      _atendimentos[indice].copyWith(notaFiscalEmitida: true);
+  _alteracoes.add(null);
+  return true;
+}
+
+List<Atendimento> notasFiscaisEmMemoria({
+  int? pacienteId,
+  bool apenasPendentes = false,
+}) {
+  // Consulta todos os dias: uma nota pendente não desaparece ao virar a data.
+  final notas = _atendimentos.where((atendimento) {
+    return atendimento.emitirNotaFiscal &&
+        (pacienteId == null || atendimento.pacienteId == pacienteId) &&
+        (!apenasPendentes || atendimento.notaFiscalPendente);
+  }).toList();
+  notas.sort((a, b) => a.dataHora.compareTo(b.dataHora));
+  return notas;
 }
 
 List<Atendimento> atendimentosDoDia(DateTime data) {

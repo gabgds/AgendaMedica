@@ -1,6 +1,6 @@
-// Isso é provisório, porque eu já coloquei streams pra mostrar as coisas
-// do inicio. Desse jeito eu separei as informações específicas da apresentação
-// delas com os widgets. O banco de dados que vai substituir isso. - Gustavo
+// PROVISÓRIO: os dados do Início vêm da memória.
+// Consultar contadores, próxima consulta e agenda no banco com Drift.
+// Manter os streams consumidos pela tela.
 
 import 'package:pex/shared/atendimento/atendimento.dart';
 import 'package:pex/shared/atendimento/dados_em_memoria.dart';

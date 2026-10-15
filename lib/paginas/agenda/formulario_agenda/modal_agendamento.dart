@@ -46,6 +46,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
 
   int? pacienteId;
   int? clinicaId;
+  bool? emitirNotaFiscal;
   late DateTime dataSelecionada;
   TimeOfDay? horarioSelecionado;
 
@@ -124,6 +125,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
         horario.hour, horario.minute,
       ),
       duracaoMinutos: int.parse(duracaoController.text),
+      emitirNotaFiscal: emitirNotaFiscal!,
     ));
   }
 
@@ -149,11 +151,14 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
         clinicas: widget.clinicas,
         pacienteId: pacienteId,
         clinicaId: clinicaId,
+        emitirNotaFiscal: emitirNotaFiscal,
         dataController: dataController,
         horarioController: horarioController,
         duracaoController: duracaoController,
         aoSelecionarPaciente: (id) => setState(() => pacienteId = id),
         aoSelecionarClinica: (id) => setState(() => clinicaId = id),
+        aoSelecionarNotaFiscal: (valor) =>
+            setState(() => emitirNotaFiscal = valor),
         escolherData: escolherData,
         escolherHorario: escolherHorario,
       ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pex/shared/clinica/clinica.dart';
+import '../clinica.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 
 class InformacoesPerfilClinica extends StatelessWidget {

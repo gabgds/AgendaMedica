@@ -8,8 +8,6 @@ class Paciente {
     this.cpf = '',
     this.endereco = '',
     this.email = '',
-    this.emitirNotaFiscal = false,
-    this.clinicaId,
   });
 
   final int id;
@@ -19,7 +17,12 @@ class Paciente {
   final String cpf;
   final String endereco;
   final String email;
-  final bool emitirNotaFiscal;
-  // null indica um paciente avulso, sem vínculo com clínica.
-  final int? clinicaId;
+
+  String get telefoneFormatado {
+    final numeros = telefone.replaceAll(RegExp(r'\D'), '');
+    if (numeros.length != 10 && numeros.length != 11) return telefone;
+    final ddd = numeros.substring(0, 2);
+    final corte = numeros.length - 4;
+    return '($ddd) ${numeros.substring(2, corte)}-${numeros.substring(corte)}';
+  }
 }
