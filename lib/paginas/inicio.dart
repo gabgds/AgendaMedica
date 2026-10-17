@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../shared/navegacao/barra_navegacao.dart';
 import 'conteudo_inicio/conteudo_inicio.dart';
 import 'agenda/agenda.dart';
+import 'pacientes/pacientes.dart';
 
 class Inicio extends StatefulWidget {
   const Inicio({super.key});
@@ -25,6 +26,9 @@ class _InicioState extends State<Inicio> {
     }
     else if (indiceAtual == 1){
       return Agenda();
+    }
+    else if (indiceAtual == 2){
+      return const Pacientes();
     }
 
     return const Center(
