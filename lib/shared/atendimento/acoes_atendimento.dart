@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/botões/botao.dart';
 
-// Rodapé visual do modal. As ações serão implementadas posteriormente.
+// Ações do agendamento. Atendimentos concluídos ou cancelados exibem Fechar.
 class AcoesAtendimento extends StatelessWidget {
-  const AcoesAtendimento({super.key, this.concluido = false});
+  const AcoesAtendimento({
+    super.key,
+    this.concluido = false,
+    this.cancelado = false,
+    this.aoConcluir,
+    this.aoEditar,
+    this.aoCancelar,
+  });
 
   final bool concluido;
+  final bool cancelado;
+  final VoidCallback? aoConcluir;
+  final VoidCallback? aoEditar;
+  final VoidCallback? aoCancelar;
 
   @override
   Widget build(BuildContext context) {
-    if (concluido) return botaoFechar(context);
+    if (concluido || cancelado) return botaoFechar(context);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -20,7 +31,7 @@ class AcoesAtendimento extends StatelessWidget {
           child: Button(
             'Marcar como concluído',
             padding: EdgeInsets.zero,
-            onPressed: () {},
+            onPressed: aoConcluir,
           ),
         ),
         const SizedBox(height: 16),
@@ -52,7 +63,7 @@ class AcoesAtendimento extends StatelessWidget {
         'Editar agendamento',
         cor: const Color(0xFF207CD4),
         padding: EdgeInsets.zero,
-        onPressed: () {},
+        onPressed: aoEditar,
       ),
     );
   }
@@ -61,7 +72,7 @@ class AcoesAtendimento extends StatelessWidget {
     return SizedBox(
       height: 40,
       child: TextButton(
-        onPressed: () {},
+        onPressed: aoCancelar,
         style: TextButton.styleFrom(foregroundColor: const Color(0xFFFF3333)),
         child: const Text(
           'Cancelar agendamento',

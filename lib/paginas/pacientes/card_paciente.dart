@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 import 'package:pex/shared/funcoes/gerar_cor_avatar.dart';
 import 'package:pex/shared/funcoes/obter_iniciais.dart';
-import 'package:pex/shared/paciente/paciente.dart';
+import 'paciente.dart';
 import 'package:pex/shared/listagem/card_listagem.dart';
 
 // Card com a identificação do paciente e espaço para uma ação ao clicar.

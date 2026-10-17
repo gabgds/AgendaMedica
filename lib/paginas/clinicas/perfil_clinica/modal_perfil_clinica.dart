@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pex/shared/clinica/clinica.dart';
-import 'package:pex/shared/clinica/dados_clinicas_em_memoria.dart';
+import '../clinica.dart';
+import '../dados_clinicas_em_memoria.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
 import '../formulario_clinica/modal_clinica.dart';
 import 'acoes_perfil_clinica.dart';

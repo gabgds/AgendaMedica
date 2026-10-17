@@ -1,12 +1,18 @@
-// Opções provisórias. Depois, consultar os pacientes e clínicas no banco.
-// Cada chave é o ID e cada valor é o nome exibido no seletor.
-const pacientesAgendamentoTeste = <int, String>{
-  1: 'Ana Carolina',
-  2: 'Maria Silva',
-  3: 'João Pedro',
+// PROVISÓRIO: pacientes e clínicas do seletor vêm de listas em memória.
+// Substituir estas leituras por consultas ao banco com Drift.
+
+import '../../clinicas/dados_clinicas_em_memoria.dart';
+import '../../clinicas/dados_clinicas_teste.dart';
+import '../../pacientes/dados_pacientes_em_memoria.dart';
+import '../../pacientes/dados_pacientes_teste.dart';
+
+// Inclui os cadastros atuais e preserva os IDs do histórico das consultas.
+Map<int, String> get pacientesAgendamentoTeste => {
+  for (final paciente in pacientesEmMemoria(pacientesTeste))
+    paciente.id: paciente.nome,
 };
 
-const clinicasAgendamentoTeste = <int, String>{
-  1: 'Clínica Saúde',
-  2: 'Clínica Multicare',
+Map<int, String> get clinicasAgendamentoTeste => {
+  for (final clinica in clinicasEmMemoria(clinicasTeste))
+    clinica.id: clinica.nome,
 };

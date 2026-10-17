@@ -1,9 +1,11 @@
-import 'package:pex/shared/paciente/paciente.dart';
+// PROVISÓRIO: pacientes fictícios usados pelas telas.
+// Substituir esta lista por pacientes carregados do banco com Drift.
 
-// Dados temporários para montar a tela enquanto o banco não está conectado.
+import 'paciente.dart';
+
 const pacientesTeste = [
   Paciente(
-    id: 1,
+    id: 3,
     nome: 'João Pedro',
     telefone: '(11) 99876-5432',
   ),
@@ -12,4 +14,5 @@ const pacientesTeste = [
     nome: 'Maria Silva',
     telefone: '(48) 99475-8442',
   ),
+  Paciente(id: 1, nome: 'Ana Carolina', telefone: ''),
 ];

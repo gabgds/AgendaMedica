@@ -5,16 +5,18 @@ import 'package:pex/shared/funcoes/gerar_cor_avatar.dart';
 import 'package:pex/shared/funcoes/obter_iniciais.dart';
 
 // Exibe os dados da consulta e a apresentação do perfil do paciente.
-// O telefone é opcional porque ainda não está disponível em Atendimento.
+// O telefone vem do cadastro atual; a navegação é fornecida pelo modal.
 class InformacoesAtendimento extends StatelessWidget {
   const InformacoesAtendimento({
     super.key,
     required this.atendimento,
     this.telefonePaciente,
+    this.aoAbrirPerfilPaciente,
   });
 
   final Atendimento atendimento;
   final String? telefonePaciente;
+  final VoidCallback? aoAbrirPerfilPaciente;
 
   static const fundo = Color(0xFFEEF4F8);
 
@@ -50,6 +52,7 @@ class InformacoesAtendimento extends StatelessWidget {
           linha('DURAÇÃO', '${atendimento.duracaoMinutos} minutos'),
           linha('SALA', sala),
           linha('CLÍNICA', clinica),
+          linha('NOTA FISCAL', atendimento.situacaoNotaFiscal),
         ],
       ),
     );
@@ -89,8 +92,7 @@ class InformacoesAtendimento extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        // Por enquanto, o perfil tem somente aparência.
-        onTap: () {},
+        onTap: aoAbrirPerfilPaciente,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           child: Row(

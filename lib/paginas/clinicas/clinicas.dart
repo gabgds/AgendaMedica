@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pex/shared/clinica/clinica.dart';
-import 'package:pex/shared/clinica/dados_clinicas_em_memoria.dart';
+import 'clinica.dart';
+import 'dados_clinicas_em_memoria.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 import 'cabecalho_clinicas.dart';
 import 'card_clinica.dart';

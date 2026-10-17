@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
-import 'package:pex/shared/paciente/paciente.dart';
-import 'package:pex/shared/paciente/dados_pacientes_em_memoria.dart';
-import '../agenda/formulario_agenda/dados_agendamento_teste.dart';
+import 'paciente.dart';
+import 'dados_pacientes_em_memoria.dart';
 import 'cabecalho_pacientes.dart';
 import 'card_paciente.dart';
 import 'dados_pacientes_teste.dart';
@@ -14,14 +13,12 @@ class Pacientes extends StatefulWidget {
   const Pacientes({
     super.key,
     this.pacientes = pacientesTeste,
-    this.clinicas = clinicasAgendamentoTeste,
     this.aoAdicionar,
     this.aoAbrirPaciente,
     this.aoAbrirNotasFiscais,
   });
 
   final List<Paciente> pacientes;
-  final Map<int, String> clinicas;
   final VoidCallback? aoAdicionar;
   final ValueChanged<Paciente>? aoAbrirPaciente;
   final ValueChanged<Paciente>? aoAbrirNotasFiscais;
@@ -45,7 +42,7 @@ class _PacientesState extends State<Pacientes> {
     cadastroAberto = true;
 
     try {
-      final novo = await abrirModalPaciente(context, clinicas: widget.clinicas);
+      final novo = await abrirModalPaciente(context);
       if (!mounted || novo == null) return;
 
       final paciente = novo.paraPaciente(
@@ -70,7 +67,6 @@ class _PacientesState extends State<Pacientes> {
       await abrirModalPerfilPaciente(
         context,
         paciente: paciente,
-        clinicas: widget.clinicas,
         aoAbrirNotasFiscais: widget.aoAbrirNotasFiscais,
       );
       if (!mounted) return;

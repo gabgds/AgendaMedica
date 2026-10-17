@@ -6,6 +6,7 @@ class NovoAgendamento {
     required this.clinicaId,
     required this.dataHora,
     required this.duracaoMinutos,
+    required this.emitirNotaFiscal,
   });
 
   final int pacienteId;
@@ -13,4 +14,5 @@ class NovoAgendamento {
   final int? clinicaId;
   final DateTime dataHora;
   final int duracaoMinutos;
+  final bool emitirNotaFiscal;
 }

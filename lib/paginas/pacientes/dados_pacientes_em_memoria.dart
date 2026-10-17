@@ -1,7 +1,9 @@
+// PROVISÓRIO: os cadastros de pacientes ficam apenas na memória.
+// Os dados são perdidos ao encerrar o aplicativo.
+// Substituir por consultas e gravações no banco de dados com Drift.
+
 import 'paciente.dart';
 
-// Cadastros provisórios, mantidos mesmo quando a aba Pacientes é desmontada.
-// A lista é reiniciada ao encerrar o aplicativo; depois, consultar o banco.
 final _pacientesCadastrados = <Paciente>[];
 final _pacientesEditados = <int, Paciente>{};
 final _pacientesRemovidos = <int>{};

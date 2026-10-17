@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../shared/botões/botao.dart';
 import '../../../shared/formulario/modal_formulario.dart';
+import '../../../shared/atendimento/atendimento.dart';
 import 'campos_agendamento.dart';
 import 'novo_agendamento.dart';
 
-// Abre o formulário como modal e devolve os dados ao clicar em Agendar.
+// Reutiliza o formulário para criar ou editar e devolve os dados ao salvar.
 // Ao fechar com a seta, arrastar ou tocar fora, o resultado é null.
 Future<NovoAgendamento?> abrirModalAgendamento(
   BuildContext context, {
   required DateTime dataInicial,
   required Map<int, String> pacientes,
   required Map<int, String> clinicas,
+  Atendimento? atendimentoInicial,
 }) {
   return abrirModalFormulario<NovoAgendamento>(
     context,
@@ -18,6 +20,7 @@ Future<NovoAgendamento?> abrirModalAgendamento(
       dataInicial: dataInicial,
       pacientes: pacientes,
       clinicas: clinicas,
+      atendimentoInicial: atendimentoInicial,
     ),
   );
 }
@@ -28,11 +31,13 @@ class ModalAgendamento extends StatefulWidget {
     required this.dataInicial,
     required this.pacientes,
     required this.clinicas,
+    this.atendimentoInicial,
   });
 
   final DateTime dataInicial;
   final Map<int, String> pacientes;
   final Map<int, String> clinicas;
+  final Atendimento? atendimentoInicial;
 
   @override
   State<ModalAgendamento> createState() => _ModalAgendamentoState();
@@ -46,13 +51,25 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
 
   int? pacienteId;
   int? clinicaId;
+  bool? emitirNotaFiscal;
   late DateTime dataSelecionada;
   TimeOfDay? horarioSelecionado;
 
   @override
   void initState() {
     super.initState();
-    dataSelecionada = DateUtils.dateOnly(widget.dataInicial);
+    final atendimento = widget.atendimentoInicial;
+    dataSelecionada = DateUtils.dateOnly(
+      atendimento?.dataHora ?? widget.dataInicial,
+    );
+    if (atendimento != null) {
+      pacienteId = atendimento.pacienteId;
+      clinicaId = atendimento.clinicaId ?? 0;
+      emitirNotaFiscal = atendimento.emitirNotaFiscal;
+      horarioSelecionado = TimeOfDay.fromDateTime(atendimento.dataHora);
+      horarioController.text = atendimento.horario;
+      duracaoController.text = atendimento.duracaoMinutos.toString();
+    }
     atualizarTextoData();
   }
 
@@ -72,7 +89,8 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
 
   Future<void> escolherData() async {
     final ano = DateTime.now().year;
-    final primeiraData = DateTime(ano);
+    final anoOriginal = widget.atendimentoInicial?.dataHora.year ?? ano;
+    final primeiraData = DateTime(anoOriginal < ano ? anoOriginal : ano);
     final ultimaData = DateTime(ano + 100, 12, 31);
     var inicial = dataSelecionada;
     if (inicial.isBefore(primeiraData)) inicial = primeiraData;
@@ -111,7 +129,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
     horarioController.text = '$hora:$minuto';
   }
 
-  void agendar() {
+  void salvar() {
     if (!chaveFormulario.currentState!.validate()) return;
     final horario = horarioSelecionado!;
 
@@ -124,18 +142,23 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
         horario.hour, horario.minute,
       ),
       duracaoMinutos: int.parse(duracaoController.text),
+      emitirNotaFiscal: emitirNotaFiscal!,
     ));
   }
 
   @override
   Widget build(BuildContext context) {
+    final editando = widget.atendimentoInicial != null;
     return ModalFormulario(
       // Mantém o formulário e o botão acima do teclado.
-      titulo: 'Nova consulta',
+      titulo: editando ? 'Editar agendamento' : 'Nova consulta',
       conteudo: formulario(),
       rodape: SizedBox(
         height: 50,
-        child: Button('Agendar consulta', onPressed: agendar),
+        child: Button(
+          editando ? 'Salvar alterações' : 'Agendar consulta',
+          onPressed: salvar,
+        ),
       ),
     );
   }
@@ -149,11 +172,14 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
         clinicas: widget.clinicas,
         pacienteId: pacienteId,
         clinicaId: clinicaId,
+        emitirNotaFiscal: emitirNotaFiscal,
         dataController: dataController,
         horarioController: horarioController,
         duracaoController: duracaoController,
         aoSelecionarPaciente: (id) => setState(() => pacienteId = id),
         aoSelecionarClinica: (id) => setState(() => clinicaId = id),
+        aoSelecionarNotaFiscal: (valor) =>
+            setState(() => emitirNotaFiscal = valor),
         escolherData: escolherData,
         escolherHorario: escolherHorario,
       ),

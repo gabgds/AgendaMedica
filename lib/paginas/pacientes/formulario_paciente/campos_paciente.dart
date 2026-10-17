@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pex/shared/estilo/estilo_texto.dart';
 import 'package:pex/shared/formulario/campo_formulario.dart';
 import 'package:pex/shared/formulario/validacoes_login_cadastro.dart';
 
@@ -14,12 +13,7 @@ class CamposPaciente extends StatelessWidget {
     required this.enderecoController,
     required this.emailController,
     required this.telefoneController,
-    required this.clinicas,
-    required this.clinicaId,
-    required this.emitirNotaFiscal,
     required this.escolherData,
-    required this.aoSelecionarClinica,
-    required this.aoSelecionarNotaFiscal,
   });
 
   final TextEditingController nomeController;
@@ -28,12 +22,7 @@ class CamposPaciente extends StatelessWidget {
   final TextEditingController enderecoController;
   final TextEditingController emailController;
   final TextEditingController telefoneController;
-  final Map<int, String> clinicas;
-  final int? clinicaId;
-  final bool? emitirNotaFiscal;
   final VoidCallback escolherData;
-  final ValueChanged<int?> aoSelecionarClinica;
-  final ValueChanged<bool> aoSelecionarNotaFiscal;
 
   @override
   Widget build(BuildContext context) {
@@ -113,110 +102,7 @@ class CamposPaciente extends StatelessWidget {
             LengthLimitingTextInputFormatter(11),
           ],
         ),
-        const SizedBox(height: 20),
-        campoNotaFiscal(),
-        const SizedBox(height: 28),
-        DropdownButtonFormField<int>(
-          initialValue: clinicaId,
-          isExpanded: true,
-          style: const TextStyle(color: Color(0xFF29363D), fontSize: 14),
-          decoration: decoracaoCampoFormulario('CLÍNICA', compacto: true),
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
-          items: [
-            const DropdownMenuItem(value: 0, child: Text('Avulso')),
-            for (final clinica in clinicas.entries)
-              if (clinica.key != 0)
-                DropdownMenuItem(
-                  value: clinica.key,
-                  child: Text(clinica.value),
-                ),
-          ],
-          onChanged: aoSelecionarClinica,
-          validator: (valor) => valor == null
-              ? 'Selecione uma clínica ou Avulso'
-              : null,
-        ),
       ],
-    );
-  }
-
-  Widget campoNotaFiscal() {
-    return FormField<bool>(
-      initialValue: emitirNotaFiscal,
-      validator: (valor) => valor == null ? 'Selecione Sim ou Não' : null,
-      builder: (campo) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const TextoComEstilo(
-              'EMITIR NOTA FISCAL',
-              cor: Color(0xFF757575),
-              tamanho: 14,
-              peso: FontWeight.bold,
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                opcaoNotaFiscal('Sim', true, campo),
-                const SizedBox(width: 15),
-                opcaoNotaFiscal('Não', false, campo),
-              ],
-            ),
-            if (campo.hasError)
-              Padding(
-                padding: const EdgeInsets.only(top: 8, left: 18),
-                child: Text(
-                  campo.errorText!,
-                  style: TextStyle(
-                    color: Theme.of(campo.context).colorScheme.error,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget opcaoNotaFiscal(String texto, bool valor, FormFieldState<bool> campo) {
-    final selecionado = campo.value == valor;
-
-    return Semantics(
-      label: texto,
-      checked: selecionado,
-      inMutuallyExclusiveGroup: true,
-      child: Material(
-        color: const Color(0xFFE9F0F6),
-        borderRadius: BorderRadius.circular(14),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () {
-            campo.didChange(valor);
-            aoSelecionarNotaFiscal(valor);
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  selecionado ? Icons.radio_button_checked : Icons.circle,
-                  size: 20,
-                  color: selecionado ? const Color(0xFF009691) : Colors.white,
-                ),
-                const SizedBox(width: 5),
-                TextoComEstilo(
-                  texto,
-                  cor: const Color(0xFF757575),
-                  tamanho: 14,
-                  peso: FontWeight.bold,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 

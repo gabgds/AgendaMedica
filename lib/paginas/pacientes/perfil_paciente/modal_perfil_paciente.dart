@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:pex/shared/estilo/estilo_texto.dart';
+import 'package:pex/shared/atendimento/atendimento.dart';
+import 'package:pex/shared/atendimento/dados_em_memoria.dart';
+import 'package:pex/shared/atendimento/modal_notas_fiscais.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
-import 'package:pex/shared/paciente/dados_pacientes_em_memoria.dart';
-import 'package:pex/shared/paciente/paciente.dart';
+import '../dados_pacientes_em_memoria.dart';
+import '../paciente.dart';
 import '../formulario_paciente/modal_paciente.dart';
 import 'acoes_perfil_paciente.dart';
 import 'informacoes_perfil_paciente.dart';
@@ -10,14 +12,12 @@ import 'informacoes_perfil_paciente.dart';
 Future<void> abrirModalPerfilPaciente(
   BuildContext context, {
   required Paciente paciente,
-  required Map<int, String> clinicas,
   ValueChanged<Paciente>? aoAbrirNotasFiscais,
 }) async {
   await abrirModalFormulario<void>(
     context,
     builder: (context) => ModalPerfilPaciente(
       paciente: paciente,
-      clinicas: clinicas,
       aoAbrirNotasFiscais: aoAbrirNotasFiscais,
     ),
   );
@@ -27,12 +27,10 @@ class ModalPerfilPaciente extends StatefulWidget {
   const ModalPerfilPaciente({
     super.key,
     required this.paciente,
-    required this.clinicas,
     this.aoAbrirNotasFiscais,
   });
 
   final Paciente paciente;
-  final Map<int, String> clinicas;
   final ValueChanged<Paciente>? aoAbrirNotasFiscais;
 
   @override
@@ -42,6 +40,9 @@ class ModalPerfilPaciente extends StatefulWidget {
 class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
   late Paciente paciente;
   bool acaoAberta = false;
+  late final streamNotasFiscais = observarDadosEmMemoria(
+    () => notasFiscaisEmMemoria(pacienteId: widget.paciente.id),
+  );
 
   @override
   void initState() {
@@ -55,14 +56,12 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
     try {
       final dados = await abrirModalPaciente(
         context,
-        clinicas: widget.clinicas,
         pacienteInicial: paciente,
       );
       if (!mounted || dados == null) return;
 
       final atualizado = dados.paraPaciente(id: paciente.id);
       atualizarPacienteEmMemoria(atualizado);
-      // Reavalia também a visibilidade de Notas fiscais ao salvar a edição.
       setState(() => paciente = atualizado);
     } finally {
       acaoAberta = false;
@@ -103,7 +102,9 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
   }
 
   Future<void> abrirNotasFiscais() async {
-    if (!paciente.emitirNotaFiscal || acaoAberta) return;
+    if (acaoAberta || notasFiscaisEmMemoria(pacienteId: paciente.id).isEmpty) {
+      return;
+    }
     acaoAberta = true;
     try {
       if (widget.aoAbrirNotasFiscais != null) {
@@ -111,30 +112,7 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
         return;
       }
 
-      // Estado vazio provisório. O callback permite conectar a tela de notas.
-      await abrirModalFormulario<void>(
-        context,
-        builder: (context) => ModalFormulario(
-          titulo: 'Notas fiscais',
-          conteudo: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextoComEstilo(
-                paciente.nome,
-                cor: const Color(0xFF29363D),
-                tamanho: 20,
-                peso: FontWeight.bold,
-              ),
-              const SizedBox(height: 20),
-              const TextoComEstilo(
-                'Nenhuma nota fiscal cadastrada.',
-                cor: Color(0xFF757575),
-                tamanho: 16,
-              ),
-            ],
-          ),
-        ),
-      );
+      await abrirModalNotasFiscais(context, pacienteId: paciente.id);
     } finally {
       acaoAberta = false;
     }
@@ -145,11 +123,15 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
     return ModalFormulario(
       titulo: paciente.nome,
       conteudo: InformacoesPerfilPaciente(paciente: paciente),
-      rodape: AcoesPerfilPaciente(
-        emitirNotaFiscal: paciente.emitirNotaFiscal,
-        aoAbrirNotasFiscais: abrirNotasFiscais,
-        aoEditar: editarPaciente,
-        aoRemover: removerPaciente,
+      rodape: StreamBuilder<List<Atendimento>>(
+        stream: streamNotasFiscais,
+        initialData: notasFiscaisEmMemoria(pacienteId: paciente.id),
+        builder: (context, snapshot) => AcoesPerfilPaciente(
+          possuiNotasFiscais: snapshot.data?.isNotEmpty ?? false,
+          aoAbrirNotasFiscais: abrirNotasFiscais,
+          aoEditar: editarPaciente,
+          aoRemover: removerPaciente,
+        ),
       ),
     );
   }

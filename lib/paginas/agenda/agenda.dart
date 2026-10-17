@@ -34,12 +34,13 @@ class _AgendaState extends State<Agenda> {
   }
 
   Future<void> adicionarAtendimento() async {
-    // Coloque a navegação para o formulário de agendamento aqui.
+    final pacientes = pacientesAgendamentoTeste;
+    final clinicas = clinicasAgendamentoTeste;
     final consulta = await abrirModalAgendamento(
       context,
       dataInicial: dataSelecionada,
-      pacientes: pacientesAgendamentoTeste,
-      clinicas: clinicasAgendamentoTeste,
+      pacientes: pacientes,
+      clinicas: clinicas,
     );
 
     if (!mounted || consulta == null) return;
@@ -47,12 +48,13 @@ class _AgendaState extends State<Agenda> {
     adicionarAtendimentoEmMemoria(
       pacienteId: consulta.pacienteId,
       clinicaId: consulta.clinicaId,
-      nomePaciente: pacientesAgendamentoTeste[consulta.pacienteId]!,
+      nomePaciente: pacientes[consulta.pacienteId]!,
       nomeClinica: consulta.clinicaId == null
           ? ''
-          : clinicasAgendamentoTeste[consulta.clinicaId]!,
+          : clinicas[consulta.clinicaId]!,
       dataHora: consulta.dataHora,
       duracaoMinutos: consulta.duracaoMinutos,
+      emitirNotaFiscal: consulta.emitirNotaFiscal,
     );
 
     selecionarData(consulta.dataHora);

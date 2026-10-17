@@ -85,4 +85,3 @@ class FormInput extends StatelessWidget {
     );
   }
 }
-

@@ -1,6 +1,9 @@
+// PROVISÓRIO: os cadastros de clínicas ficam apenas na memória.
+// Os dados são perdidos ao encerrar o aplicativo.
+// Substituir por consultas e gravações no banco de dados com Drift.
+
 import 'clinica.dart';
 
-// Dados provisórios, mantidos entre trocas de aba durante esta execução.
 final _clinicasCadastradas = <Clinica>[];
 final _clinicasEditadas = <int, Clinica>{};
 final _clinicasRemovidas = <int>{};

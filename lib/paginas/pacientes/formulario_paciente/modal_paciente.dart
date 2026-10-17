@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/botões/botao.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
-import 'package:pex/shared/paciente/paciente.dart';
+import '../paciente.dart';
 import 'campos_paciente.dart';
 import 'novo_paciente.dart';
 
+// Reutiliza os mesmos campos para cadastrar e editar.
+// Retorna os dados ao salvar e null ao fechar sem salvar.
 Future<NovoPaciente?> abrirModalPaciente(
   BuildContext context, {
-  required Map<int, String> clinicas,
   Paciente? pacienteInicial,
 }) {
   return abrirModalFormulario<NovoPaciente>(
     context,
     builder: (context) => ModalPaciente(
-      clinicas: clinicas,
       pacienteInicial: pacienteInicial,
     ),
   );
@@ -22,11 +22,9 @@ Future<NovoPaciente?> abrirModalPaciente(
 class ModalPaciente extends StatefulWidget {
   const ModalPaciente({
     super.key,
-    required this.clinicas,
     this.pacienteInicial,
   });
 
-  final Map<int, String> clinicas;
   final Paciente? pacienteInicial;
 
   @override
@@ -43,8 +41,6 @@ class _ModalPacienteState extends State<ModalPaciente> {
   final telefoneController = TextEditingController();
 
   DateTime? dataNascimento;
-  bool? emitirNotaFiscal;
-  int? clinicaId;
   bool escolhendoData = false;
 
   @override
@@ -58,8 +54,6 @@ class _ModalPacienteState extends State<ModalPaciente> {
     enderecoController.text = paciente.endereco;
     emailController.text = paciente.email;
     telefoneController.text = paciente.telefone.replaceAll(RegExp(r'\D'), '');
-    emitirNotaFiscal = paciente.emitirNotaFiscal;
-    clinicaId = paciente.clinicaId ?? 0;
     dataNascimento = paciente.dataNascimento;
     atualizarTextoData();
   }
@@ -126,8 +120,6 @@ class _ModalPacienteState extends State<ModalPaciente> {
         endereco: enderecoController.text.trim(),
         email: emailController.text.trim(),
         telefone: telefoneController.text.trim(),
-        emitirNotaFiscal: emitirNotaFiscal!,
-        clinicaId: clinicaId == 0 ? null : clinicaId,
       ),
     );
   }
@@ -135,13 +127,6 @@ class _ModalPacienteState extends State<ModalPaciente> {
   @override
   Widget build(BuildContext context) {
     final editando = widget.pacienteInicial != null;
-    final clinicas = <int, String>{...widget.clinicas};
-    final clinicaInicial = widget.pacienteInicial?.clinicaId;
-    if (clinicaInicial != null) {
-      // Preserva vínculos existentes mesmo se a clínica não veio nas opções.
-      clinicas.putIfAbsent(clinicaInicial, () => 'Clínica $clinicaInicial');
-    }
-
     return ModalFormulario(
       titulo: editando ? 'Editar paciente' : 'Novo paciente',
       conteudo: Form(
@@ -154,13 +139,7 @@ class _ModalPacienteState extends State<ModalPaciente> {
           enderecoController: enderecoController,
           emailController: emailController,
           telefoneController: telefoneController,
-          clinicas: clinicas,
-          clinicaId: clinicaId,
-          emitirNotaFiscal: emitirNotaFiscal,
           escolherData: escolherData,
-          aoSelecionarClinica: (id) => setState(() => clinicaId = id),
-          aoSelecionarNotaFiscal: (valor) =>
-              setState(() => emitirNotaFiscal = valor),
         ),
       ),
       rodape: SizedBox(

@@ -5,6 +5,7 @@ import '../shared/botões/botao.dart';
 import 'cadastro.dart';
 import '../shared/formulario/validacoes_login_cadastro.dart';
 import 'inicio.dart';
+import '../shared/usuario/dados_perfil_em_memoria.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -15,6 +16,13 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final chaveFormulario = GlobalKey<FormState>();
+  final emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
 
   void entrar() {
     if (!chaveFormulario.currentState!.validate()) {
@@ -22,6 +30,7 @@ class _LoginState extends State<Login> {
     }
 
     // Coloque a autenticação aqui quando conectar o login.
+    iniciarPerfilEmMemoria(email: emailController.text.trim());
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Campos válidos!')),
     );
@@ -54,6 +63,7 @@ class _LoginState extends State<Login> {
 
         FormInput(
           'EMAIL',
+          controller: emailController,
           teclado: TextInputType.emailAddress,
           validator: validarEmail,
         ),
