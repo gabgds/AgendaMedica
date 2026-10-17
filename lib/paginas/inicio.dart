@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'shared/navegacao/barra_navegacao.dart';
-import 'paginas/conteudo_inicio/conteudo_inicio.dart';
+import '../shared/navegacao/barra_navegacao.dart';
+import 'conteudo_inicio/conteudo_inicio.dart';
+import 'agenda/agenda.dart';
 
 class Inicio extends StatefulWidget {
   const Inicio({super.key});
@@ -21,6 +22,9 @@ class _InicioState extends State<Inicio> {
   Widget paginaAtual() {
     if (indiceAtual == 0) {
       return ConteudoInicio();
+    }
+    else if (indiceAtual == 1){
+      return Agenda();
     }
 
     return const Center(

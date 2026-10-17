@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
+import '../../shared/atendimento/atendimento.dart';
 
 class CardProximoAtendimento extends StatelessWidget {
   const CardProximoAtendimento({
     super.key,
-    required this.horario,
-    required this.paciente,
-    required this.local,
-    required this.descricao,
+    required this.atendimento,
     required this.onTap,
   });
 
-  final String horario;
-  final String paciente;
-  final String local;
-  final String descricao;
+  final Atendimento atendimento;
   final VoidCallback onTap;
 
   static const Color ciano = Color(0xFF1B8780);
@@ -87,13 +82,13 @@ class CardProximoAtendimento extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             TextoComEstilo(
-              horario,
+              atendimento.horario,
               cor: ciano,
               tamanho: 22,
               peso: FontWeight.bold,
             ),
             TextoComEstilo(
-              paciente,
+              atendimento.nomePaciente,
               cor: Colors.black87,
               tamanho: 18,
               peso: FontWeight.bold,
@@ -102,10 +97,14 @@ class CardProximoAtendimento extends StatelessWidget {
         ),
         const SizedBox(height: 4),
 
-        TextoComEstilo(local, cor: Colors.grey[600]!),
+        TextoComEstilo(atendimento.local, cor: Colors.grey[600]!),
         const SizedBox(height: 4),
 
-        TextoComEstilo(descricao, cor: Colors.grey[600]!, tamanho: 12),
+        TextoComEstilo(
+          '${atendimento.duracaoMinutos} min',
+          cor: Colors.grey[600]!,
+          tamanho: 12,
+        ),
       ],
     );
   }
