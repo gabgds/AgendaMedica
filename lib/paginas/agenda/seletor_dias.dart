@@ -78,6 +78,7 @@ class SeletorDias extends StatelessWidget {
     );
   }
 
+  // botão individual que mostra um dia
   Widget botaoDia(DateTime data) {
     final selecionado = DateUtils.isSameDay(data, dataSelecionada);
 

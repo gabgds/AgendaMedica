@@ -16,7 +16,7 @@ class Atendimento {
 
   final int id;
   final int pacienteId;
-  final int clinicaId;
+  final int? clinicaId;
   final String nomePaciente;
   final String nomeClinica;
   final DateTime dataHora;
@@ -31,9 +31,14 @@ class Atendimento {
   }
 
   String get local {
+    if (clinicaId == null) {
+      return 'Avulso';
+    }
+
     if (sala.trim().isEmpty) {
       return nomeClinica;
     }
+
     return '$nomeClinica - Sala $sala';
   }
 }
