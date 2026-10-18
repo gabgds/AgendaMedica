@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// A mesma decoração pode ser usada por campos de texto e seletores.
-// O modo compacto segue o layout dos modais, sem alterar os campos de login.
 InputDecoration decoracaoCampoFormulario(
   String texto, {
   bool compacto = false,

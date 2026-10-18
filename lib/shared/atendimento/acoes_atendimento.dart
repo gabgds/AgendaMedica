@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/botões/botao.dart';
 
-// Ações do agendamento. Atendimentos concluídos ou cancelados exibem Fechar.
 class AcoesAtendimento extends StatelessWidget {
   const AcoesAtendimento({
     super.key,

@@ -1,4 +1,3 @@
-// Dados da clínica exibidos na listagem e no cadastro.
 class Clinica {
   const Clinica({
     required this.id,

@@ -5,8 +5,6 @@ import '../paciente.dart';
 import 'campos_paciente.dart';
 import 'novo_paciente.dart';
 
-// Reutiliza os mesmos campos para cadastrar e editar.
-// Retorna os dados ao salvar e null ao fechar sem salvar.
 Future<NovoPaciente?> abrirModalPaciente(
   BuildContext context, {
   Paciente? pacienteInicial,

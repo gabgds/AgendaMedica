@@ -1,6 +1,3 @@
-// Isso é um retângulo individual que mostra quantidade de atendimentos.
-// Podem ser atendimentos totais do dia, concluídos ou restantes.
-
 import 'package:flutter/material.dart';
 
 class ContadorResumo extends StatelessWidget {

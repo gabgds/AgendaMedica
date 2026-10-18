@@ -8,7 +8,6 @@ import 'dados_pacientes_teste.dart';
 import 'formulario_paciente/modal_paciente.dart';
 import 'perfil_paciente/modal_perfil_paciente.dart';
 
-// Conteúdo da aba Pacientes. O Scaffold e a navegação ficam em Inicio.
 class Pacientes extends StatefulWidget {
   const Pacientes({
     super.key,
@@ -33,7 +32,6 @@ class _PacientesState extends State<Pacientes> {
   bool perfilAberto = false;
 
   Future<void> adicionarPaciente() async {
-    // Mantém a possibilidade de o chamador fornecer sua própria ação.
     if (widget.aoAdicionar != null) {
       widget.aoAdicionar!();
       return;
@@ -70,7 +68,6 @@ class _PacientesState extends State<Pacientes> {
         aoAbrirNotasFiscais: widget.aoAbrirNotasFiscais,
       );
       if (!mounted) return;
-      // Reflete na lista as edições e remoções realizadas no perfil.
       setState(() {});
     } finally {
       perfilAberto = false;

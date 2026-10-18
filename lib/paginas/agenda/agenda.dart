@@ -64,13 +64,11 @@ class _AgendaState extends State<Agenda> {
   }
 
   void abrirAtendimento(Atendimento atendimento) {
-    // O futuro modal pode receber atendimento ou consultar atendimento.id.
     abrirModalAtendimento(context, atendimento: atendimento);
   }
 
   @override
   Widget build(BuildContext context) {
-    // O Scaffold, a SafeArea e a barra inferior já estão no Inicio.
     return ColoredBox(
       color: const Color(0xFFF8F9FD),
       child: Column(
@@ -125,7 +123,6 @@ class _AgendaState extends State<Agenda> {
 
   Widget listaAtendimentos() {
     return StreamBuilder<List<Atendimento>>(
-      // Reinicia o snapshot ao trocar o dia, sem mostrar dados do dia anterior.
       key: ValueKey(dataSelecionada),
       stream: streamAtendimentos,
       builder: (context, snapshot) {

@@ -1,6 +1,5 @@
 import '../paciente.dart';
 
-// Dados preenchidos no formulário. O ID é definido ao salvar o paciente.
 class NovoPaciente {
   const NovoPaciente({
     required this.nome,
@@ -18,7 +17,6 @@ class NovoPaciente {
   final String email;
   final String telefone;
 
-  // A mesma conversão é usada no cadastro e na edição, preservando o ID.
   Paciente paraPaciente({required int id}) {
     return Paciente(
       id: id,

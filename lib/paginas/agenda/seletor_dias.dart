@@ -63,7 +63,6 @@ class SeletorDias extends StatelessWidget {
   }
 
   Widget semana() {
-    // Domingo é o primeiro dia. DateTime também ajusta viradas de mês e ano.
     final domingo = DateTime(
       dataSelecionada.year,
       dataSelecionada.month,
@@ -78,7 +77,6 @@ class SeletorDias extends StatelessWidget {
     );
   }
 
-  // botão individual que mostra um dia
   Widget botaoDia(DateTime data) {
     final selecionado = DateUtils.isSameDay(data, dataSelecionada);
 

@@ -70,7 +70,6 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
     try {
       await abrirModalPerfilPaciente(context, paciente: paciente);
       if (!mounted) return;
-      // Reconsulta o cadastro para refletir edições de telefone e remoções.
       setState(() {});
     } finally {
       acaoAberta = false;

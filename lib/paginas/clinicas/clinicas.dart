@@ -8,7 +8,6 @@ import 'dados_clinicas_teste.dart';
 import 'formulario_clinica/modal_clinica.dart';
 import 'perfil_clinica/modal_perfil_clinica.dart';
 
-// Conteúdo da aba: o Scaffold e a barra de navegação ficam em Inicio.
 class Clinicas extends StatefulWidget {
   const Clinicas({
     super.key,
@@ -80,7 +79,6 @@ class _ClinicasState extends State<Clinicas> {
     try {
       await abrirModalPerfilClinica(context, clinica: clinica);
       if (!mounted) return;
-      // Atualiza os cards, o contador e a pesquisa após editar ou remover.
       setState(() {});
     } finally {
       detalhesAbertos = false;

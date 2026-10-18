@@ -14,7 +14,6 @@ class CardProximoAtendimento extends StatelessWidget {
 
   static const Color ciano = Color(0xFF1B8780);
 
-  // Card branco arredondado nos cantos
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -36,7 +35,6 @@ class CardProximoAtendimento extends StatelessWidget {
     );
   }
 
-  // é o que junta o ícone do relógio com a coluna de informação em uma linha
   Widget conteudoDoAtendimento() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,7 +64,6 @@ class CardProximoAtendimento extends StatelessWidget {
     );
   }
 
-  // Informações do próximo atendimento
   Widget informacoes() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

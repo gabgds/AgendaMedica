@@ -5,8 +5,6 @@ import '../../../shared/atendimento/atendimento.dart';
 import 'campos_agendamento.dart';
 import 'novo_agendamento.dart';
 
-// Reutiliza o formulário para criar ou editar e devolve os dados ao salvar.
-// Ao fechar com a seta, arrastar ou tocar fora, o resultado é null.
 Future<NovoAgendamento?> abrirModalAgendamento(
   BuildContext context, {
   required DateTime dataInicial,
@@ -135,7 +133,6 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
 
     Navigator.pop(context, NovoAgendamento(
       pacienteId: pacienteId!,
-      // Converte a opção Avulso do seletor em ausência de vínculo com clínica.
       clinicaId: clinicaId == 0 ? null : clinicaId,
       dataHora: DateTime(
         dataSelecionada.year, dataSelecionada.month, dataSelecionada.day,
@@ -150,7 +147,6 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
   Widget build(BuildContext context) {
     final editando = widget.atendimentoInicial != null;
     return ModalFormulario(
-      // Mantém o formulário e o botão acima do teclado.
       titulo: editando ? 'Editar agendamento' : 'Nova consulta',
       conteudo: formulario(),
       rodape: SizedBox(

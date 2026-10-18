@@ -1,7 +1,3 @@
-// PROVISÓRIO: os cadastros de pacientes ficam apenas na memória.
-// Os dados são perdidos ao encerrar o aplicativo.
-// Substituir por consultas e gravações no banco de dados com Drift.
-
 import 'paciente.dart';
 
 final _pacientesCadastrados = <Paciente>[];
@@ -32,7 +28,6 @@ void atualizarPacienteEmMemoria(Paciente paciente) {
 }
 
 void removerPacienteEmMemoria(int pacienteId) {
-  // Também permite remover dados de teste sem alterar a lista constante.
   _pacientesRemovidos.add(pacienteId);
   _pacientesEditados.remove(pacienteId);
 }
@@ -48,6 +43,5 @@ int proximoIdPacienteEmMemoria(List<Paciente> pacientesIniciais) {
   for (final id in ids) {
     if (id > maiorId) maiorId = id;
   }
-  // Não reutiliza o ID de um paciente removido durante esta execução.
   return maiorId + 1;
 }

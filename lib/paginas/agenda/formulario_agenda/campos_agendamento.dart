@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 import 'package:pex/shared/formulario/campo_formulario.dart';
 
-// Campos do formulário. A data, o horário e as seleções ficam no modal.
 class CamposAgendamento extends StatelessWidget {
   const CamposAgendamento({
     super.key,
@@ -54,7 +53,6 @@ class CamposAgendamento extends StatelessWidget {
         const SizedBox(height: 28),
         seletor(
           'CLÍNICA',
-          // O valor 0 identifica Avulso somente no seletor, sem criar uma clínica.
           {0: 'Avulso', ...clinicas},
           clinicaId,
           aoSelecionarClinica,

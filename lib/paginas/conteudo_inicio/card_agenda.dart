@@ -12,9 +12,6 @@ class CardAgenda extends StatelessWidget {
 
   static final Color cinza = Colors.grey[800]!;
 
-  // o snapshot da variável stream vem parar nessa lista
-  // a lista de ItemAtendimento que vem do conteudo_inicio.dart vem parar aqui
-  // passando pelo snapshot e chegando nessa lista atendimentos
   final List<Widget> atendimentos;
 
   @override

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/listagem/cabecalho_listagem.dart';
 
-// Cabeçalho da página: título, botão de cadastro e campo de busca.
 class CabecalhoPacientes extends StatelessWidget {
   const CabecalhoPacientes({
     super.key,

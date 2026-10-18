@@ -4,7 +4,6 @@ import 'package:pex/shared/listagem/card_listagem.dart';
 import 'atendimento.dart';
 import 'dados_em_memoria.dart';
 
-// Usado no aviso do Início e no histórico de notas do perfil do paciente.
 Future<void> abrirModalNotasFiscais(
   BuildContext context, {
   int? pacienteId,

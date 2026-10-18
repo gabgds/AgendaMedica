@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pex/shared/botões/botao.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 
-// Cabeçalho e pesquisa compartilhados pelas listas de pacientes e clínicas.
 class CabecalhoListagem extends StatelessWidget {
   const CabecalhoListagem({
     super.key,

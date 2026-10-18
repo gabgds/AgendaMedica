@@ -1,6 +1,3 @@
-// Organiza os dados de um atendimento para uso nos cards e no modal de detalhes.
-// Atualmente recebe dados de teste que vem de dados_agenda_teste.dart, depois receberá dados consultados no banco.
-
 class Atendimento {
   const Atendimento({
     required this.id,
