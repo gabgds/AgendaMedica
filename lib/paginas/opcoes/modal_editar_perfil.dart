@@ -27,7 +27,7 @@ class ModalEditarPerfil extends StatefulWidget {
 class _ModalEditarPerfilState extends State<ModalEditarPerfil> {
   final chaveFormulario = GlobalKey<FormState>();
   final nomeController = TextEditingController();
-  final emailController = TextEditingController();
+  final usuarioController = TextEditingController();
   final senhaController = TextEditingController();
   final confirmacaoController = TextEditingController();
 
@@ -35,13 +35,13 @@ class _ModalEditarPerfilState extends State<ModalEditarPerfil> {
   void initState() {
     super.initState();
     nomeController.text = widget.perfilInicial.nome;
-    emailController.text = widget.perfilInicial.email;
+    usuarioController.text = widget.perfilInicial.usuario;
   }
 
   @override
   void dispose() {
     nomeController.dispose();
-    emailController.dispose();
+    usuarioController.dispose();
     senhaController.dispose();
     confirmacaoController.dispose();
     super.dispose();
@@ -54,7 +54,7 @@ class _ModalEditarPerfilState extends State<ModalEditarPerfil> {
       context,
       EdicaoPerfil(
         nome: nomeController.text.trim(),
-        email: emailController.text.trim(),
+        usuario: usuarioController.text.trim(),
         novaSenha: senhaController.text.isEmpty ? null : senhaController.text,
       ),
     );
@@ -69,7 +69,7 @@ class _ModalEditarPerfilState extends State<ModalEditarPerfil> {
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: CamposPerfil(
           nomeController: nomeController,
-          emailController: emailController,
+          usuarioController: usuarioController,
           senhaController: senhaController,
           confirmacaoController: confirmacaoController,
         ),

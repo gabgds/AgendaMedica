@@ -5,7 +5,8 @@ import '../shared/botões/botao.dart';
 import 'cadastro.dart';
 import '../shared/formulario/validacoes_login_cadastro.dart';
 import 'inicio.dart';
-import '../shared/usuario/dados_perfil_em_memoria.dart';
+import '../repositorios/medicos_repositorio.dart';
+import '../shared/usuario/sessao.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -16,28 +17,46 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final chaveFormulario = GlobalKey<FormState>();
-  final emailController = TextEditingController();
+  final usuarioController = TextEditingController();
+  final senhaController = TextEditingController();
+  bool entrando = false;
 
   @override
   void dispose() {
-    emailController.dispose();
+    usuarioController.dispose();
+    senhaController.dispose();
     super.dispose();
   }
 
-  void entrar() {
-    if (!chaveFormulario.currentState!.validate()) {
+  Future<void> entrar() async {
+    if (entrando || !chaveFormulario.currentState!.validate()) {
       return;
     }
 
-    iniciarPerfilEmMemoria(email: emailController.text.trim());
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Campos válidos!')),
-    );
+    entrando = true;
+    try {
+      final medico = await autenticarMedico(
+        usuario: usuarioController.text,
+        senha: senhaController.text,
+      );
+      if (!mounted) return;
+      if (medico == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Usuário ou senha incorretos.')),
+        );
+        return;
+      }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const Inicio()),
-    );
+      await entrarESalvarSessao(medico);
+      if (!mounted) return;
+      senhaController.clear();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Inicio()),
+      );
+    } finally {
+      entrando = false;
+    }
   }
 
   @override
@@ -61,16 +80,16 @@ class _LoginState extends State<Login> {
         const SizedBox(height: 32),
 
         FormInput(
-          'EMAIL',
-          controller: emailController,
-          teclado: TextInputType.emailAddress,
-          validator: validarEmail,
+          'USUÁRIO',
+          controller: usuarioController,
+          validator: validarUsuario,
         ),
         const SizedBox(height: 22),
 
         FormInput(
           'SENHA',
           senha: true,
+          controller: senhaController,
           validator: validarSenha,
         ),
         const SizedBox(height: 22),

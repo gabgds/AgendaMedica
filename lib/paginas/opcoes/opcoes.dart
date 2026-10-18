@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
-import 'package:pex/shared/usuario/dados_perfil_em_memoria.dart';
+import 'package:pex/repositorios/medicos_repositorio.dart';
+import 'package:pex/shared/usuario/sessao.dart';
 import 'card_perfil.dart';
 import 'card_sair.dart';
 import 'edicao_perfil.dart';
@@ -25,20 +26,36 @@ class _OpcoesState extends State<Opcoes> {
     try {
       final edicao = await abrirModalEditarPerfil(
         context,
-        perfilInicial: obterPerfilEmMemoria(),
+        perfilInicial: medicoLogado!,
       );
       if (!mounted || edicao == null) return;
-      atualizarPerfilEmMemoria(edicao.paraPerfil());
+      final perfil = await atualizarMedico(
+        id: medicoLogadoId,
+        nome: edicao.nome,
+        usuario: edicao.usuario,
+        novaSenha: edicao.novaSenha,
+      );
+      await entrarESalvarSessao(perfil);
       widget.aoEditarPerfil?.call(edicao);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Perfil atualizado.')),
+      );
+    } on UsuarioJaCadastrado catch (erro) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(erro.toString())),
+      );
     } finally {
       modalAberto = false;
     }
   }
 
-  void sair() {
+  Future<void> sair() async {
     if (saindo) return;
     saindo = true;
-    limparPerfilEmMemoria();
+    await sairDaSessao();
+    if (!mounted) return;
     Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil<void>(
       '/login',
       (route) => false,
