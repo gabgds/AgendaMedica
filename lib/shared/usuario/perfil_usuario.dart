@@ -1,6 +1,7 @@
 class PerfilUsuario {
-  const PerfilUsuario({this.nome = '', this.email = ''});
+  const PerfilUsuario({this.id = 0, this.nome = '', this.usuario = ''});
 
+  final int id;
   final String nome;
-  final String email;
+  final String usuario;
 }

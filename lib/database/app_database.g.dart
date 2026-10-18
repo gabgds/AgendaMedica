@@ -3,7 +3,8 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
-class $MedicosTable extends Medicos with TableInfo<$MedicosTable, Medico> {
+class $MedicosTable extends Medicos
+    with TableInfo<$MedicosTable, MedicoRegistro> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -22,25 +23,28 @@ class $MedicosTable extends Medicos with TableInfo<$MedicosTable, Medico> {
   late final GeneratedColumn<String> nome = GeneratedColumn<String>(
       'nome', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  static const VerificationMeta _usuarioMeta =
+      const VerificationMeta('usuario');
   @override
-  late final GeneratedColumn<String> email = GeneratedColumn<String>(
-      'email', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+  late final GeneratedColumn<String> usuario = GeneratedColumn<String>(
+      'usuario', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
   static const VerificationMeta _senhaMeta = const VerificationMeta('senha');
   @override
   late final GeneratedColumn<String> senha = GeneratedColumn<String>(
       'senha', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [id, nome, email, senha];
+  List<GeneratedColumn> get $columns => [id, nome, usuario, senha];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'medicos';
   @override
-  VerificationContext validateIntegrity(Insertable<Medico> instance,
+  VerificationContext validateIntegrity(Insertable<MedicoRegistro> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -53,11 +57,11 @@ class $MedicosTable extends Medicos with TableInfo<$MedicosTable, Medico> {
     } else if (isInserting) {
       context.missing(_nomeMeta);
     }
-    if (data.containsKey('email')) {
-      context.handle(
-          _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
+    if (data.containsKey('usuario')) {
+      context.handle(_usuarioMeta,
+          usuario.isAcceptableOrUnknown(data['usuario']!, _usuarioMeta));
     } else if (isInserting) {
-      context.missing(_emailMeta);
+      context.missing(_usuarioMeta);
     }
     if (data.containsKey('senha')) {
       context.handle(
@@ -71,15 +75,15 @@ class $MedicosTable extends Medicos with TableInfo<$MedicosTable, Medico> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Medico map(Map<String, dynamic> data, {String? tablePrefix}) {
+  MedicoRegistro map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Medico(
+    return MedicoRegistro(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       nome: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}nome'])!,
-      email: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}email'])!,
+      usuario: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}usuario'])!,
       senha: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}senha'])!,
     );
@@ -91,22 +95,22 @@ class $MedicosTable extends Medicos with TableInfo<$MedicosTable, Medico> {
   }
 }
 
-class Medico extends DataClass implements Insertable<Medico> {
+class MedicoRegistro extends DataClass implements Insertable<MedicoRegistro> {
   final int id;
   final String nome;
-  final String email;
+  final String usuario;
   final String senha;
-  const Medico(
+  const MedicoRegistro(
       {required this.id,
       required this.nome,
-      required this.email,
+      required this.usuario,
       required this.senha});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['nome'] = Variable<String>(nome);
-    map['email'] = Variable<String>(email);
+    map['usuario'] = Variable<String>(usuario);
     map['senha'] = Variable<String>(senha);
     return map;
   }
@@ -115,18 +119,18 @@ class Medico extends DataClass implements Insertable<Medico> {
     return MedicosCompanion(
       id: Value(id),
       nome: Value(nome),
-      email: Value(email),
+      usuario: Value(usuario),
       senha: Value(senha),
     );
   }
 
-  factory Medico.fromJson(Map<String, dynamic> json,
+  factory MedicoRegistro.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Medico(
+    return MedicoRegistro(
       id: serializer.fromJson<int>(json['id']),
       nome: serializer.fromJson<String>(json['nome']),
-      email: serializer.fromJson<String>(json['email']),
+      usuario: serializer.fromJson<String>(json['usuario']),
       senha: serializer.fromJson<String>(json['senha']),
     );
   }
@@ -136,79 +140,80 @@ class Medico extends DataClass implements Insertable<Medico> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'nome': serializer.toJson<String>(nome),
-      'email': serializer.toJson<String>(email),
+      'usuario': serializer.toJson<String>(usuario),
       'senha': serializer.toJson<String>(senha),
     };
   }
 
-  Medico copyWith({int? id, String? nome, String? email, String? senha}) =>
-      Medico(
+  MedicoRegistro copyWith(
+          {int? id, String? nome, String? usuario, String? senha}) =>
+      MedicoRegistro(
         id: id ?? this.id,
         nome: nome ?? this.nome,
-        email: email ?? this.email,
+        usuario: usuario ?? this.usuario,
         senha: senha ?? this.senha,
       );
-  Medico copyWithCompanion(MedicosCompanion data) {
-    return Medico(
+  MedicoRegistro copyWithCompanion(MedicosCompanion data) {
+    return MedicoRegistro(
       id: data.id.present ? data.id.value : this.id,
       nome: data.nome.present ? data.nome.value : this.nome,
-      email: data.email.present ? data.email.value : this.email,
+      usuario: data.usuario.present ? data.usuario.value : this.usuario,
       senha: data.senha.present ? data.senha.value : this.senha,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('Medico(')
+    return (StringBuffer('MedicoRegistro(')
           ..write('id: $id, ')
           ..write('nome: $nome, ')
-          ..write('email: $email, ')
+          ..write('usuario: $usuario, ')
           ..write('senha: $senha')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, nome, email, senha);
+  int get hashCode => Object.hash(id, nome, usuario, senha);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Medico &&
+      (other is MedicoRegistro &&
           other.id == this.id &&
           other.nome == this.nome &&
-          other.email == this.email &&
+          other.usuario == this.usuario &&
           other.senha == this.senha);
 }
 
-class MedicosCompanion extends UpdateCompanion<Medico> {
+class MedicosCompanion extends UpdateCompanion<MedicoRegistro> {
   final Value<int> id;
   final Value<String> nome;
-  final Value<String> email;
+  final Value<String> usuario;
   final Value<String> senha;
   const MedicosCompanion({
     this.id = const Value.absent(),
     this.nome = const Value.absent(),
-    this.email = const Value.absent(),
+    this.usuario = const Value.absent(),
     this.senha = const Value.absent(),
   });
   MedicosCompanion.insert({
     this.id = const Value.absent(),
     required String nome,
-    required String email,
+    required String usuario,
     required String senha,
   })  : nome = Value(nome),
-        email = Value(email),
+        usuario = Value(usuario),
         senha = Value(senha);
-  static Insertable<Medico> custom({
+  static Insertable<MedicoRegistro> custom({
     Expression<int>? id,
     Expression<String>? nome,
-    Expression<String>? email,
+    Expression<String>? usuario,
     Expression<String>? senha,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (nome != null) 'nome': nome,
-      if (email != null) 'email': email,
+      if (usuario != null) 'usuario': usuario,
       if (senha != null) 'senha': senha,
     });
   }
@@ -216,12 +221,12 @@ class MedicosCompanion extends UpdateCompanion<Medico> {
   MedicosCompanion copyWith(
       {Value<int>? id,
       Value<String>? nome,
-      Value<String>? email,
+      Value<String>? usuario,
       Value<String>? senha}) {
     return MedicosCompanion(
       id: id ?? this.id,
       nome: nome ?? this.nome,
-      email: email ?? this.email,
+      usuario: usuario ?? this.usuario,
       senha: senha ?? this.senha,
     );
   }
@@ -235,8 +240,8 @@ class MedicosCompanion extends UpdateCompanion<Medico> {
     if (nome.present) {
       map['nome'] = Variable<String>(nome.value);
     }
-    if (email.present) {
-      map['email'] = Variable<String>(email.value);
+    if (usuario.present) {
+      map['usuario'] = Variable<String>(usuario.value);
     }
     if (senha.present) {
       map['senha'] = Variable<String>(senha.value);
@@ -249,14 +254,15 @@ class MedicosCompanion extends UpdateCompanion<Medico> {
     return (StringBuffer('MedicosCompanion(')
           ..write('id: $id, ')
           ..write('nome: $nome, ')
-          ..write('email: $email, ')
+          ..write('usuario: $usuario, ')
           ..write('senha: $senha')
           ..write(')'))
         .toString();
   }
 }
 
-class $ClinicasTable extends Clinicas with TableInfo<$ClinicasTable, Clinica> {
+class $ClinicasTable extends Clinicas
+    with TableInfo<$ClinicasTable, ClinicaRegistro> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -298,7 +304,7 @@ class $ClinicasTable extends Clinicas with TableInfo<$ClinicasTable, Clinica> {
   String get actualTableName => $name;
   static const String $name = 'clinicas';
   @override
-  VerificationContext validateIntegrity(Insertable<Clinica> instance,
+  VerificationContext validateIntegrity(Insertable<ClinicaRegistro> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -329,9 +335,9 @@ class $ClinicasTable extends Clinicas with TableInfo<$ClinicasTable, Clinica> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Clinica map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ClinicaRegistro map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Clinica(
+    return ClinicaRegistro(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       medicoId: attachedDatabase.typeMapping
@@ -349,12 +355,12 @@ class $ClinicasTable extends Clinicas with TableInfo<$ClinicasTable, Clinica> {
   }
 }
 
-class Clinica extends DataClass implements Insertable<Clinica> {
+class ClinicaRegistro extends DataClass implements Insertable<ClinicaRegistro> {
   final int id;
   final int medicoId;
   final String nome;
   final String endereco;
-  const Clinica(
+  const ClinicaRegistro(
       {required this.id,
       required this.medicoId,
       required this.nome,
@@ -378,10 +384,10 @@ class Clinica extends DataClass implements Insertable<Clinica> {
     );
   }
 
-  factory Clinica.fromJson(Map<String, dynamic> json,
+  factory ClinicaRegistro.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Clinica(
+    return ClinicaRegistro(
       id: serializer.fromJson<int>(json['id']),
       medicoId: serializer.fromJson<int>(json['medicoId']),
       nome: serializer.fromJson<String>(json['nome']),
@@ -399,15 +405,16 @@ class Clinica extends DataClass implements Insertable<Clinica> {
     };
   }
 
-  Clinica copyWith({int? id, int? medicoId, String? nome, String? endereco}) =>
-      Clinica(
+  ClinicaRegistro copyWith(
+          {int? id, int? medicoId, String? nome, String? endereco}) =>
+      ClinicaRegistro(
         id: id ?? this.id,
         medicoId: medicoId ?? this.medicoId,
         nome: nome ?? this.nome,
         endereco: endereco ?? this.endereco,
       );
-  Clinica copyWithCompanion(ClinicasCompanion data) {
-    return Clinica(
+  ClinicaRegistro copyWithCompanion(ClinicasCompanion data) {
+    return ClinicaRegistro(
       id: data.id.present ? data.id.value : this.id,
       medicoId: data.medicoId.present ? data.medicoId.value : this.medicoId,
       nome: data.nome.present ? data.nome.value : this.nome,
@@ -417,7 +424,7 @@ class Clinica extends DataClass implements Insertable<Clinica> {
 
   @override
   String toString() {
-    return (StringBuffer('Clinica(')
+    return (StringBuffer('ClinicaRegistro(')
           ..write('id: $id, ')
           ..write('medicoId: $medicoId, ')
           ..write('nome: $nome, ')
@@ -431,14 +438,14 @@ class Clinica extends DataClass implements Insertable<Clinica> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Clinica &&
+      (other is ClinicaRegistro &&
           other.id == this.id &&
           other.medicoId == this.medicoId &&
           other.nome == this.nome &&
           other.endereco == this.endereco);
 }
 
-class ClinicasCompanion extends UpdateCompanion<Clinica> {
+class ClinicasCompanion extends UpdateCompanion<ClinicaRegistro> {
   final Value<int> id;
   final Value<int> medicoId;
   final Value<String> nome;
@@ -457,7 +464,7 @@ class ClinicasCompanion extends UpdateCompanion<Clinica> {
   })  : medicoId = Value(medicoId),
         nome = Value(nome),
         endereco = Value(endereco);
-  static Insertable<Clinica> custom({
+  static Insertable<ClinicaRegistro> custom({
     Expression<int>? id,
     Expression<int>? medicoId,
     Expression<String>? nome,
@@ -515,7 +522,7 @@ class ClinicasCompanion extends UpdateCompanion<Clinica> {
 }
 
 class $PacientesTable extends Pacientes
-    with TableInfo<$PacientesTable, Paciente> {
+    with TableInfo<$PacientesTable, PacienteRegistro> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -563,9 +570,7 @@ class $PacientesTable extends Pacientes
   @override
   late final GeneratedColumn<String> cpf = GeneratedColumn<String>(
       'cpf', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: true,
-      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _enderecoMeta =
       const VerificationMeta('endereco');
   @override
@@ -601,7 +606,7 @@ class $PacientesTable extends Pacientes
   String get actualTableName => $name;
   static const String $name = 'pacientes';
   @override
-  VerificationContext validateIntegrity(Insertable<Paciente> instance,
+  VerificationContext validateIntegrity(Insertable<PacienteRegistro> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -664,9 +669,13 @@ class $PacientesTable extends Pacientes
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Paciente map(Map<String, dynamic> data, {String? tablePrefix}) {
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {medicoId, cpf},
+      ];
+  @override
+  PacienteRegistro map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Paciente(
+    return PacienteRegistro(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       medicoId: attachedDatabase.typeMapping
@@ -694,7 +703,8 @@ class $PacientesTable extends Pacientes
   }
 }
 
-class Paciente extends DataClass implements Insertable<Paciente> {
+class PacienteRegistro extends DataClass
+    implements Insertable<PacienteRegistro> {
   final int id;
   final int medicoId;
   final int? clinicaId;
@@ -704,7 +714,7 @@ class Paciente extends DataClass implements Insertable<Paciente> {
   final String endereco;
   final String email;
   final String telefone;
-  const Paciente(
+  const PacienteRegistro(
       {required this.id,
       required this.medicoId,
       this.clinicaId,
@@ -747,10 +757,10 @@ class Paciente extends DataClass implements Insertable<Paciente> {
     );
   }
 
-  factory Paciente.fromJson(Map<String, dynamic> json,
+  factory PacienteRegistro.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Paciente(
+    return PacienteRegistro(
       id: serializer.fromJson<int>(json['id']),
       medicoId: serializer.fromJson<int>(json['medicoId']),
       clinicaId: serializer.fromJson<int?>(json['clinicaId']),
@@ -778,7 +788,7 @@ class Paciente extends DataClass implements Insertable<Paciente> {
     };
   }
 
-  Paciente copyWith(
+  PacienteRegistro copyWith(
           {int? id,
           int? medicoId,
           Value<int?> clinicaId = const Value.absent(),
@@ -788,7 +798,7 @@ class Paciente extends DataClass implements Insertable<Paciente> {
           String? endereco,
           String? email,
           String? telefone}) =>
-      Paciente(
+      PacienteRegistro(
         id: id ?? this.id,
         medicoId: medicoId ?? this.medicoId,
         clinicaId: clinicaId.present ? clinicaId.value : this.clinicaId,
@@ -799,8 +809,8 @@ class Paciente extends DataClass implements Insertable<Paciente> {
         email: email ?? this.email,
         telefone: telefone ?? this.telefone,
       );
-  Paciente copyWithCompanion(PacientesCompanion data) {
-    return Paciente(
+  PacienteRegistro copyWithCompanion(PacientesCompanion data) {
+    return PacienteRegistro(
       id: data.id.present ? data.id.value : this.id,
       medicoId: data.medicoId.present ? data.medicoId.value : this.medicoId,
       clinicaId: data.clinicaId.present ? data.clinicaId.value : this.clinicaId,
@@ -819,7 +829,7 @@ class Paciente extends DataClass implements Insertable<Paciente> {
 
   @override
   String toString() {
-    return (StringBuffer('Paciente(')
+    return (StringBuffer('PacienteRegistro(')
           ..write('id: $id, ')
           ..write('medicoId: $medicoId, ')
           ..write('clinicaId: $clinicaId, ')
@@ -839,7 +849,7 @@ class Paciente extends DataClass implements Insertable<Paciente> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Paciente &&
+      (other is PacienteRegistro &&
           other.id == this.id &&
           other.medicoId == this.medicoId &&
           other.clinicaId == this.clinicaId &&
@@ -851,7 +861,7 @@ class Paciente extends DataClass implements Insertable<Paciente> {
           other.telefone == this.telefone);
 }
 
-class PacientesCompanion extends UpdateCompanion<Paciente> {
+class PacientesCompanion extends UpdateCompanion<PacienteRegistro> {
   final Value<int> id;
   final Value<int> medicoId;
   final Value<int?> clinicaId;
@@ -889,7 +899,7 @@ class PacientesCompanion extends UpdateCompanion<Paciente> {
         endereco = Value(endereco),
         email = Value(email),
         telefone = Value(telefone);
-  static Insertable<Paciente> custom({
+  static Insertable<PacienteRegistro> custom({
     Expression<int>? id,
     Expression<int>? medicoId,
     Expression<int>? clinicaId,
@@ -987,7 +997,7 @@ class PacientesCompanion extends UpdateCompanion<Paciente> {
 }
 
 class $AgendamentosTable extends Agendamentos
-    with TableInfo<$AgendamentosTable, Agendamento> {
+    with TableInfo<$AgendamentosTable, AgendamentoRegistro> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1029,7 +1039,9 @@ class $AgendamentosTable extends Agendamentos
   @override
   late final GeneratedColumn<String> sala = GeneratedColumn<String>(
       'sala', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
   static const VerificationMeta _duracaoMinutosMeta =
       const VerificationMeta('duracaoMinutos');
   @override
@@ -1040,7 +1052,9 @@ class $AgendamentosTable extends Agendamentos
   @override
   late final GeneratedColumn<String> status = GeneratedColumn<String>(
       'status', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(StatusAgendamento.agendado));
   @override
   List<GeneratedColumn> get $columns =>
       [id, pacienteId, clinicaId, dataHora, sala, duracaoMinutos, status];
@@ -1050,7 +1064,8 @@ class $AgendamentosTable extends Agendamentos
   String get actualTableName => $name;
   static const String $name = 'agendamentos';
   @override
-  VerificationContext validateIntegrity(Insertable<Agendamento> instance,
+  VerificationContext validateIntegrity(
+      Insertable<AgendamentoRegistro> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -1078,8 +1093,6 @@ class $AgendamentosTable extends Agendamentos
     if (data.containsKey('sala')) {
       context.handle(
           _salaMeta, sala.isAcceptableOrUnknown(data['sala']!, _salaMeta));
-    } else if (isInserting) {
-      context.missing(_salaMeta);
     }
     if (data.containsKey('duracao_minutos')) {
       context.handle(
@@ -1092,8 +1105,6 @@ class $AgendamentosTable extends Agendamentos
     if (data.containsKey('status')) {
       context.handle(_statusMeta,
           status.isAcceptableOrUnknown(data['status']!, _statusMeta));
-    } else if (isInserting) {
-      context.missing(_statusMeta);
     }
     return context;
   }
@@ -1101,9 +1112,9 @@ class $AgendamentosTable extends Agendamentos
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Agendamento map(Map<String, dynamic> data, {String? tablePrefix}) {
+  AgendamentoRegistro map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Agendamento(
+    return AgendamentoRegistro(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       pacienteId: attachedDatabase.typeMapping
@@ -1127,7 +1138,8 @@ class $AgendamentosTable extends Agendamentos
   }
 }
 
-class Agendamento extends DataClass implements Insertable<Agendamento> {
+class AgendamentoRegistro extends DataClass
+    implements Insertable<AgendamentoRegistro> {
   final int id;
   final int pacienteId;
   final int? clinicaId;
@@ -1135,7 +1147,7 @@ class Agendamento extends DataClass implements Insertable<Agendamento> {
   final String sala;
   final int duracaoMinutos;
   final String status;
-  const Agendamento(
+  const AgendamentoRegistro(
       {required this.id,
       required this.pacienteId,
       this.clinicaId,
@@ -1172,10 +1184,10 @@ class Agendamento extends DataClass implements Insertable<Agendamento> {
     );
   }
 
-  factory Agendamento.fromJson(Map<String, dynamic> json,
+  factory AgendamentoRegistro.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Agendamento(
+    return AgendamentoRegistro(
       id: serializer.fromJson<int>(json['id']),
       pacienteId: serializer.fromJson<int>(json['pacienteId']),
       clinicaId: serializer.fromJson<int?>(json['clinicaId']),
@@ -1199,7 +1211,7 @@ class Agendamento extends DataClass implements Insertable<Agendamento> {
     };
   }
 
-  Agendamento copyWith(
+  AgendamentoRegistro copyWith(
           {int? id,
           int? pacienteId,
           Value<int?> clinicaId = const Value.absent(),
@@ -1207,7 +1219,7 @@ class Agendamento extends DataClass implements Insertable<Agendamento> {
           String? sala,
           int? duracaoMinutos,
           String? status}) =>
-      Agendamento(
+      AgendamentoRegistro(
         id: id ?? this.id,
         pacienteId: pacienteId ?? this.pacienteId,
         clinicaId: clinicaId.present ? clinicaId.value : this.clinicaId,
@@ -1216,8 +1228,8 @@ class Agendamento extends DataClass implements Insertable<Agendamento> {
         duracaoMinutos: duracaoMinutos ?? this.duracaoMinutos,
         status: status ?? this.status,
       );
-  Agendamento copyWithCompanion(AgendamentosCompanion data) {
-    return Agendamento(
+  AgendamentoRegistro copyWithCompanion(AgendamentosCompanion data) {
+    return AgendamentoRegistro(
       id: data.id.present ? data.id.value : this.id,
       pacienteId:
           data.pacienteId.present ? data.pacienteId.value : this.pacienteId,
@@ -1233,7 +1245,7 @@ class Agendamento extends DataClass implements Insertable<Agendamento> {
 
   @override
   String toString() {
-    return (StringBuffer('Agendamento(')
+    return (StringBuffer('AgendamentoRegistro(')
           ..write('id: $id, ')
           ..write('pacienteId: $pacienteId, ')
           ..write('clinicaId: $clinicaId, ')
@@ -1251,7 +1263,7 @@ class Agendamento extends DataClass implements Insertable<Agendamento> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Agendamento &&
+      (other is AgendamentoRegistro &&
           other.id == this.id &&
           other.pacienteId == this.pacienteId &&
           other.clinicaId == this.clinicaId &&
@@ -1261,7 +1273,7 @@ class Agendamento extends DataClass implements Insertable<Agendamento> {
           other.status == this.status);
 }
 
-class AgendamentosCompanion extends UpdateCompanion<Agendamento> {
+class AgendamentosCompanion extends UpdateCompanion<AgendamentoRegistro> {
   final Value<int> id;
   final Value<int> pacienteId;
   final Value<int?> clinicaId;
@@ -1283,15 +1295,13 @@ class AgendamentosCompanion extends UpdateCompanion<Agendamento> {
     required int pacienteId,
     this.clinicaId = const Value.absent(),
     required DateTime dataHora,
-    required String sala,
+    this.sala = const Value.absent(),
     required int duracaoMinutos,
-    required String status,
+    this.status = const Value.absent(),
   })  : pacienteId = Value(pacienteId),
         dataHora = Value(dataHora),
-        sala = Value(sala),
-        duracaoMinutos = Value(duracaoMinutos),
-        status = Value(status);
-  static Insertable<Agendamento> custom({
+        duracaoMinutos = Value(duracaoMinutos);
+  static Insertable<AgendamentoRegistro> custom({
     Expression<int>? id,
     Expression<int>? pacienteId,
     Expression<int>? clinicaId,
@@ -1373,7 +1383,7 @@ class AgendamentosCompanion extends UpdateCompanion<Agendamento> {
 }
 
 class $NotasFiscaisTable extends NotasFiscais
-    with TableInfo<$NotasFiscaisTable, NotasFiscai> {
+    with TableInfo<$NotasFiscaisTable, NotaFiscalRegistro> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1403,13 +1413,15 @@ class $NotasFiscaisTable extends NotasFiscais
       'agendamento_id', aliasedName, true,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES agendamentos (id)'));
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'UNIQUE REFERENCES agendamentos (id)'));
   static const VerificationMeta _valorMeta = const VerificationMeta('valor');
   @override
   late final GeneratedColumn<double> valor = GeneratedColumn<double>(
       'valor', aliasedName, false,
-      type: DriftSqlType.double, requiredDuringInsert: true);
+      type: DriftSqlType.double,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
   static const VerificationMeta _emitidaMeta =
       const VerificationMeta('emitida');
   @override
@@ -1435,7 +1447,7 @@ class $NotasFiscaisTable extends NotasFiscais
   String get actualTableName => $name;
   static const String $name = 'notas_fiscais';
   @override
-  VerificationContext validateIntegrity(Insertable<NotasFiscai> instance,
+  VerificationContext validateIntegrity(Insertable<NotaFiscalRegistro> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -1459,8 +1471,6 @@ class $NotasFiscaisTable extends NotasFiscais
     if (data.containsKey('valor')) {
       context.handle(
           _valorMeta, valor.isAcceptableOrUnknown(data['valor']!, _valorMeta));
-    } else if (isInserting) {
-      context.missing(_valorMeta);
     }
     if (data.containsKey('emitida')) {
       context.handle(_emitidaMeta,
@@ -1478,9 +1488,9 @@ class $NotasFiscaisTable extends NotasFiscais
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  NotasFiscai map(Map<String, dynamic> data, {String? tablePrefix}) {
+  NotaFiscalRegistro map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return NotasFiscai(
+    return NotaFiscalRegistro(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       pacienteId: attachedDatabase.typeMapping
@@ -1502,14 +1512,15 @@ class $NotasFiscaisTable extends NotasFiscais
   }
 }
 
-class NotasFiscai extends DataClass implements Insertable<NotasFiscai> {
+class NotaFiscalRegistro extends DataClass
+    implements Insertable<NotaFiscalRegistro> {
   final int id;
   final int pacienteId;
   final int? agendamentoId;
   final double valor;
   final bool emitida;
   final DateTime? dataEmissao;
-  const NotasFiscai(
+  const NotaFiscalRegistro(
       {required this.id,
       required this.pacienteId,
       this.agendamentoId,
@@ -1547,10 +1558,10 @@ class NotasFiscai extends DataClass implements Insertable<NotasFiscai> {
     );
   }
 
-  factory NotasFiscai.fromJson(Map<String, dynamic> json,
+  factory NotaFiscalRegistro.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return NotasFiscai(
+    return NotaFiscalRegistro(
       id: serializer.fromJson<int>(json['id']),
       pacienteId: serializer.fromJson<int>(json['pacienteId']),
       agendamentoId: serializer.fromJson<int?>(json['agendamentoId']),
@@ -1572,14 +1583,14 @@ class NotasFiscai extends DataClass implements Insertable<NotasFiscai> {
     };
   }
 
-  NotasFiscai copyWith(
+  NotaFiscalRegistro copyWith(
           {int? id,
           int? pacienteId,
           Value<int?> agendamentoId = const Value.absent(),
           double? valor,
           bool? emitida,
           Value<DateTime?> dataEmissao = const Value.absent()}) =>
-      NotasFiscai(
+      NotaFiscalRegistro(
         id: id ?? this.id,
         pacienteId: pacienteId ?? this.pacienteId,
         agendamentoId:
@@ -1588,8 +1599,8 @@ class NotasFiscai extends DataClass implements Insertable<NotasFiscai> {
         emitida: emitida ?? this.emitida,
         dataEmissao: dataEmissao.present ? dataEmissao.value : this.dataEmissao,
       );
-  NotasFiscai copyWithCompanion(NotasFiscaisCompanion data) {
-    return NotasFiscai(
+  NotaFiscalRegistro copyWithCompanion(NotasFiscaisCompanion data) {
+    return NotaFiscalRegistro(
       id: data.id.present ? data.id.value : this.id,
       pacienteId:
           data.pacienteId.present ? data.pacienteId.value : this.pacienteId,
@@ -1605,7 +1616,7 @@ class NotasFiscai extends DataClass implements Insertable<NotasFiscai> {
 
   @override
   String toString() {
-    return (StringBuffer('NotasFiscai(')
+    return (StringBuffer('NotaFiscalRegistro(')
           ..write('id: $id, ')
           ..write('pacienteId: $pacienteId, ')
           ..write('agendamentoId: $agendamentoId, ')
@@ -1622,7 +1633,7 @@ class NotasFiscai extends DataClass implements Insertable<NotasFiscai> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is NotasFiscai &&
+      (other is NotaFiscalRegistro &&
           other.id == this.id &&
           other.pacienteId == this.pacienteId &&
           other.agendamentoId == this.agendamentoId &&
@@ -1631,7 +1642,7 @@ class NotasFiscai extends DataClass implements Insertable<NotasFiscai> {
           other.dataEmissao == this.dataEmissao);
 }
 
-class NotasFiscaisCompanion extends UpdateCompanion<NotasFiscai> {
+class NotasFiscaisCompanion extends UpdateCompanion<NotaFiscalRegistro> {
   final Value<int> id;
   final Value<int> pacienteId;
   final Value<int?> agendamentoId;
@@ -1650,12 +1661,11 @@ class NotasFiscaisCompanion extends UpdateCompanion<NotasFiscai> {
     this.id = const Value.absent(),
     required int pacienteId,
     this.agendamentoId = const Value.absent(),
-    required double valor,
+    this.valor = const Value.absent(),
     this.emitida = const Value.absent(),
     this.dataEmissao = const Value.absent(),
-  })  : pacienteId = Value(pacienteId),
-        valor = Value(valor);
-  static Insertable<NotasFiscai> custom({
+  }) : pacienteId = Value(pacienteId);
+  static Insertable<NotaFiscalRegistro> custom({
     Expression<int>? id,
     Expression<int>? pacienteId,
     Expression<int>? agendamentoId,
@@ -1747,24 +1757,24 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 typedef $$MedicosTableCreateCompanionBuilder = MedicosCompanion Function({
   Value<int> id,
   required String nome,
-  required String email,
+  required String usuario,
   required String senha,
 });
 typedef $$MedicosTableUpdateCompanionBuilder = MedicosCompanion Function({
   Value<int> id,
   Value<String> nome,
-  Value<String> email,
+  Value<String> usuario,
   Value<String> senha,
 });
 
 final class $$MedicosTableReferences
-    extends BaseReferences<_$AppDatabase, $MedicosTable, Medico> {
+    extends BaseReferences<_$AppDatabase, $MedicosTable, MedicoRegistro> {
   $$MedicosTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$ClinicasTable, List<Clinica>> _clinicasRefsTable(
-          _$AppDatabase db) =>
-      MultiTypedResultKey.fromTable(db.clinicas,
-          aliasName: 'medicos__id__clinicas__medico_id');
+  static MultiTypedResultKey<$ClinicasTable, List<ClinicaRegistro>>
+      _clinicasRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.clinicas,
+              aliasName: 'medicos__id__clinicas__medico_id');
 
   $$ClinicasTableProcessedTableManager get clinicasRefs {
     final manager = $$ClinicasTableTableManager($_db, $_db.clinicas)
@@ -1775,7 +1785,7 @@ final class $$MedicosTableReferences
         manager.$state.copyWith(prefetchedData: cache));
   }
 
-  static MultiTypedResultKey<$PacientesTable, List<Paciente>>
+  static MultiTypedResultKey<$PacientesTable, List<PacienteRegistro>>
       _pacientesRefsTable(_$AppDatabase db) =>
           MultiTypedResultKey.fromTable(db.pacientes,
               aliasName: 'medicos__id__pacientes__medico_id');
@@ -1805,8 +1815,8 @@ class $$MedicosTableFilterComposer
   ColumnFilters<String> get nome => $composableBuilder(
       column: $table.nome, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get email => $composableBuilder(
-      column: $table.email, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get usuario => $composableBuilder(
+      column: $table.usuario, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get senha => $composableBuilder(
       column: $table.senha, builder: (column) => ColumnFilters(column));
@@ -1869,8 +1879,8 @@ class $$MedicosTableOrderingComposer
   ColumnOrderings<String> get nome => $composableBuilder(
       column: $table.nome, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get email => $composableBuilder(
-      column: $table.email, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get usuario => $composableBuilder(
+      column: $table.usuario, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get senha => $composableBuilder(
       column: $table.senha, builder: (column) => ColumnOrderings(column));
@@ -1891,8 +1901,8 @@ class $$MedicosTableAnnotationComposer
   GeneratedColumn<String> get nome =>
       $composableBuilder(column: $table.nome, builder: (column) => column);
 
-  GeneratedColumn<String> get email =>
-      $composableBuilder(column: $table.email, builder: (column) => column);
+  GeneratedColumn<String> get usuario =>
+      $composableBuilder(column: $table.usuario, builder: (column) => column);
 
   GeneratedColumn<String> get senha =>
       $composableBuilder(column: $table.senha, builder: (column) => column);
@@ -1943,14 +1953,14 @@ class $$MedicosTableAnnotationComposer
 class $$MedicosTableTableManager extends RootTableManager<
     _$AppDatabase,
     $MedicosTable,
-    Medico,
+    MedicoRegistro,
     $$MedicosTableFilterComposer,
     $$MedicosTableOrderingComposer,
     $$MedicosTableAnnotationComposer,
     $$MedicosTableCreateCompanionBuilder,
     $$MedicosTableUpdateCompanionBuilder,
-    (Medico, $$MedicosTableReferences),
-    Medico,
+    (MedicoRegistro, $$MedicosTableReferences),
+    MedicoRegistro,
     PrefetchHooks Function({bool clinicasRefs, bool pacientesRefs})> {
   $$MedicosTableTableManager(_$AppDatabase db, $MedicosTable table)
       : super(TableManagerState(
@@ -1965,30 +1975,30 @@ class $$MedicosTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> nome = const Value.absent(),
-            Value<String> email = const Value.absent(),
+            Value<String> usuario = const Value.absent(),
             Value<String> senha = const Value.absent(),
           }) =>
               MedicosCompanion(
             id: id,
             nome: nome,
-            email: email,
+            usuario: usuario,
             senha: senha,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required String nome,
-            required String email,
+            required String usuario,
             required String senha,
           }) =>
               MedicosCompanion.insert(
             id: id,
             nome: nome,
-            email: email,
+            usuario: usuario,
             senha: senha,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable<$MedicosTable, Medico>(table),
+                    e.readTable<$MedicosTable, MedicoRegistro>(table),
                     $$MedicosTableReferences(db, table, e)
                   ))
               .toList(),
@@ -2004,7 +2014,8 @@ class $$MedicosTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (clinicasRefs)
-                    await $_getPrefetchedData<Medico, $MedicosTable, Clinica>(
+                    await $_getPrefetchedData<MedicoRegistro, $MedicosTable,
+                            ClinicaRegistro>(
                         currentTable: table,
                         referencedTable:
                             $$MedicosTableReferences._clinicasRefsTable(db),
@@ -2016,7 +2027,8 @@ class $$MedicosTableTableManager extends RootTableManager<
                             referencedItems.where((e) => e.medicoId == item.id),
                         typedResults: items),
                   if (pacientesRefs)
-                    await $_getPrefetchedData<Medico, $MedicosTable, Paciente>(
+                    await $_getPrefetchedData<MedicoRegistro, $MedicosTable,
+                            PacienteRegistro>(
                         currentTable: table,
                         referencedTable:
                             $$MedicosTableReferences._pacientesRefsTable(db),
@@ -2037,14 +2049,14 @@ class $$MedicosTableTableManager extends RootTableManager<
 typedef $$MedicosTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
     $MedicosTable,
-    Medico,
+    MedicoRegistro,
     $$MedicosTableFilterComposer,
     $$MedicosTableOrderingComposer,
     $$MedicosTableAnnotationComposer,
     $$MedicosTableCreateCompanionBuilder,
     $$MedicosTableUpdateCompanionBuilder,
-    (Medico, $$MedicosTableReferences),
-    Medico,
+    (MedicoRegistro, $$MedicosTableReferences),
+    MedicoRegistro,
     PrefetchHooks Function({bool clinicasRefs, bool pacientesRefs})>;
 typedef $$ClinicasTableCreateCompanionBuilder = ClinicasCompanion Function({
   Value<int> id,
@@ -2060,7 +2072,7 @@ typedef $$ClinicasTableUpdateCompanionBuilder = ClinicasCompanion Function({
 });
 
 final class $$ClinicasTableReferences
-    extends BaseReferences<_$AppDatabase, $ClinicasTable, Clinica> {
+    extends BaseReferences<_$AppDatabase, $ClinicasTable, ClinicaRegistro> {
   $$ClinicasTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $MedicosTable _medicoIdTable(_$AppDatabase db) =>
@@ -2077,7 +2089,7 @@ final class $$ClinicasTableReferences
         manager.$state.copyWith(prefetchedData: [item]));
   }
 
-  static MultiTypedResultKey<$PacientesTable, List<Paciente>>
+  static MultiTypedResultKey<$PacientesTable, List<PacienteRegistro>>
       _pacientesRefsTable(_$AppDatabase db) =>
           MultiTypedResultKey.fromTable(db.pacientes,
               aliasName: 'clinicas__id__pacientes__clinica_id');
@@ -2091,7 +2103,7 @@ final class $$ClinicasTableReferences
         manager.$state.copyWith(prefetchedData: cache));
   }
 
-  static MultiTypedResultKey<$AgendamentosTable, List<Agendamento>>
+  static MultiTypedResultKey<$AgendamentosTable, List<AgendamentoRegistro>>
       _agendamentosRefsTable(_$AppDatabase db) =>
           MultiTypedResultKey.fromTable(db.agendamentos,
               aliasName: 'clinicas__id__agendamentos__clinica_id');
@@ -2310,14 +2322,14 @@ class $$ClinicasTableAnnotationComposer
 class $$ClinicasTableTableManager extends RootTableManager<
     _$AppDatabase,
     $ClinicasTable,
-    Clinica,
+    ClinicaRegistro,
     $$ClinicasTableFilterComposer,
     $$ClinicasTableOrderingComposer,
     $$ClinicasTableAnnotationComposer,
     $$ClinicasTableCreateCompanionBuilder,
     $$ClinicasTableUpdateCompanionBuilder,
-    (Clinica, $$ClinicasTableReferences),
-    Clinica,
+    (ClinicaRegistro, $$ClinicasTableReferences),
+    ClinicaRegistro,
     PrefetchHooks Function(
         {bool medicoId, bool pacientesRefs, bool agendamentosRefs})> {
   $$ClinicasTableTableManager(_$AppDatabase db, $ClinicasTable table)
@@ -2356,7 +2368,7 @@ class $$ClinicasTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable<$ClinicasTable, Clinica>(table),
+                    e.readTable<$ClinicasTable, ClinicaRegistro>(table),
                     $$ClinicasTableReferences(db, table, e)
                   ))
               .toList(),
@@ -2399,8 +2411,8 @@ class $$ClinicasTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (pacientesRefs)
-                    await $_getPrefetchedData<Clinica, $ClinicasTable,
-                            Paciente>(
+                    await $_getPrefetchedData<ClinicaRegistro, $ClinicasTable,
+                            PacienteRegistro>(
                         currentTable: table,
                         referencedTable:
                             $$ClinicasTableReferences._pacientesRefsTable(db),
@@ -2412,8 +2424,8 @@ class $$ClinicasTableTableManager extends RootTableManager<
                                 .where((e) => e.clinicaId == item.id),
                         typedResults: items),
                   if (agendamentosRefs)
-                    await $_getPrefetchedData<Clinica, $ClinicasTable,
-                            Agendamento>(
+                    await $_getPrefetchedData<ClinicaRegistro, $ClinicasTable,
+                            AgendamentoRegistro>(
                         currentTable: table,
                         referencedTable: $$ClinicasTableReferences
                             ._agendamentosRefsTable(db),
@@ -2434,14 +2446,14 @@ class $$ClinicasTableTableManager extends RootTableManager<
 typedef $$ClinicasTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
     $ClinicasTable,
-    Clinica,
+    ClinicaRegistro,
     $$ClinicasTableFilterComposer,
     $$ClinicasTableOrderingComposer,
     $$ClinicasTableAnnotationComposer,
     $$ClinicasTableCreateCompanionBuilder,
     $$ClinicasTableUpdateCompanionBuilder,
-    (Clinica, $$ClinicasTableReferences),
-    Clinica,
+    (ClinicaRegistro, $$ClinicasTableReferences),
+    ClinicaRegistro,
     PrefetchHooks Function(
         {bool medicoId, bool pacientesRefs, bool agendamentosRefs})>;
 typedef $$PacientesTableCreateCompanionBuilder = PacientesCompanion Function({
@@ -2468,7 +2480,7 @@ typedef $$PacientesTableUpdateCompanionBuilder = PacientesCompanion Function({
 });
 
 final class $$PacientesTableReferences
-    extends BaseReferences<_$AppDatabase, $PacientesTable, Paciente> {
+    extends BaseReferences<_$AppDatabase, $PacientesTable, PacienteRegistro> {
   $$PacientesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $MedicosTable _medicoIdTable(_$AppDatabase db) =>
@@ -2499,7 +2511,7 @@ final class $$PacientesTableReferences
         manager.$state.copyWith(prefetchedData: [item]));
   }
 
-  static MultiTypedResultKey<$AgendamentosTable, List<Agendamento>>
+  static MultiTypedResultKey<$AgendamentosTable, List<AgendamentoRegistro>>
       _agendamentosRefsTable(_$AppDatabase db) =>
           MultiTypedResultKey.fromTable(db.agendamentos,
               aliasName: 'pacientes__id__agendamentos__paciente_id');
@@ -2513,7 +2525,7 @@ final class $$PacientesTableReferences
         manager.$state.copyWith(prefetchedData: cache));
   }
 
-  static MultiTypedResultKey<$NotasFiscaisTable, List<NotasFiscai>>
+  static MultiTypedResultKey<$NotasFiscaisTable, List<NotaFiscalRegistro>>
       _notasFiscaisRefsTable(_$AppDatabase db) =>
           MultiTypedResultKey.fromTable(db.notasFiscais,
               aliasName: 'pacientes__id__notas_fiscais__paciente_id');
@@ -2831,14 +2843,14 @@ class $$PacientesTableAnnotationComposer
 class $$PacientesTableTableManager extends RootTableManager<
     _$AppDatabase,
     $PacientesTable,
-    Paciente,
+    PacienteRegistro,
     $$PacientesTableFilterComposer,
     $$PacientesTableOrderingComposer,
     $$PacientesTableAnnotationComposer,
     $$PacientesTableCreateCompanionBuilder,
     $$PacientesTableUpdateCompanionBuilder,
-    (Paciente, $$PacientesTableReferences),
-    Paciente,
+    (PacienteRegistro, $$PacientesTableReferences),
+    PacienteRegistro,
     PrefetchHooks Function(
         {bool medicoId,
         bool clinicaId,
@@ -2900,7 +2912,7 @@ class $$PacientesTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable<$PacientesTable, Paciente>(table),
+                    e.readTable<$PacientesTable, PacienteRegistro>(table),
                     $$PacientesTableReferences(db, table, e)
                   ))
               .toList(),
@@ -2954,8 +2966,8 @@ class $$PacientesTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (agendamentosRefs)
-                    await $_getPrefetchedData<Paciente, $PacientesTable,
-                            Agendamento>(
+                    await $_getPrefetchedData<PacienteRegistro, $PacientesTable,
+                            AgendamentoRegistro>(
                         currentTable: table,
                         referencedTable: $$PacientesTableReferences
                             ._agendamentosRefsTable(db),
@@ -2967,8 +2979,8 @@ class $$PacientesTableTableManager extends RootTableManager<
                                 .where((e) => e.pacienteId == item.id),
                         typedResults: items),
                   if (notasFiscaisRefs)
-                    await $_getPrefetchedData<Paciente, $PacientesTable,
-                            NotasFiscai>(
+                    await $_getPrefetchedData<PacienteRegistro, $PacientesTable,
+                            NotaFiscalRegistro>(
                         currentTable: table,
                         referencedTable: $$PacientesTableReferences
                             ._notasFiscaisRefsTable(db),
@@ -2989,14 +3001,14 @@ class $$PacientesTableTableManager extends RootTableManager<
 typedef $$PacientesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
     $PacientesTable,
-    Paciente,
+    PacienteRegistro,
     $$PacientesTableFilterComposer,
     $$PacientesTableOrderingComposer,
     $$PacientesTableAnnotationComposer,
     $$PacientesTableCreateCompanionBuilder,
     $$PacientesTableUpdateCompanionBuilder,
-    (Paciente, $$PacientesTableReferences),
-    Paciente,
+    (PacienteRegistro, $$PacientesTableReferences),
+    PacienteRegistro,
     PrefetchHooks Function(
         {bool medicoId,
         bool clinicaId,
@@ -3008,9 +3020,9 @@ typedef $$AgendamentosTableCreateCompanionBuilder = AgendamentosCompanion
   required int pacienteId,
   Value<int?> clinicaId,
   required DateTime dataHora,
-  required String sala,
+  Value<String> sala,
   required int duracaoMinutos,
-  required String status,
+  Value<String> status,
 });
 typedef $$AgendamentosTableUpdateCompanionBuilder = AgendamentosCompanion
     Function({
@@ -3023,8 +3035,8 @@ typedef $$AgendamentosTableUpdateCompanionBuilder = AgendamentosCompanion
   Value<String> status,
 });
 
-final class $$AgendamentosTableReferences
-    extends BaseReferences<_$AppDatabase, $AgendamentosTable, Agendamento> {
+final class $$AgendamentosTableReferences extends BaseReferences<_$AppDatabase,
+    $AgendamentosTable, AgendamentoRegistro> {
   $$AgendamentosTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $PacientesTable _pacienteIdTable(_$AppDatabase db) =>
@@ -3055,7 +3067,7 @@ final class $$AgendamentosTableReferences
         manager.$state.copyWith(prefetchedData: [item]));
   }
 
-  static MultiTypedResultKey<$NotasFiscaisTable, List<NotasFiscai>>
+  static MultiTypedResultKey<$NotasFiscaisTable, List<NotaFiscalRegistro>>
       _notasFiscaisRefsTable(_$AppDatabase db) =>
           MultiTypedResultKey.fromTable(db.notasFiscais,
               aliasName: 'agendamentos__id__notas_fiscais__agendamento_id');
@@ -3312,14 +3324,14 @@ class $$AgendamentosTableAnnotationComposer
 class $$AgendamentosTableTableManager extends RootTableManager<
     _$AppDatabase,
     $AgendamentosTable,
-    Agendamento,
+    AgendamentoRegistro,
     $$AgendamentosTableFilterComposer,
     $$AgendamentosTableOrderingComposer,
     $$AgendamentosTableAnnotationComposer,
     $$AgendamentosTableCreateCompanionBuilder,
     $$AgendamentosTableUpdateCompanionBuilder,
-    (Agendamento, $$AgendamentosTableReferences),
-    Agendamento,
+    (AgendamentoRegistro, $$AgendamentosTableReferences),
+    AgendamentoRegistro,
     PrefetchHooks Function(
         {bool pacienteId, bool clinicaId, bool notasFiscaisRefs})> {
   $$AgendamentosTableTableManager(_$AppDatabase db, $AgendamentosTable table)
@@ -3355,9 +3367,9 @@ class $$AgendamentosTableTableManager extends RootTableManager<
             required int pacienteId,
             Value<int?> clinicaId = const Value.absent(),
             required DateTime dataHora,
-            required String sala,
+            Value<String> sala = const Value.absent(),
             required int duracaoMinutos,
-            required String status,
+            Value<String> status = const Value.absent(),
           }) =>
               AgendamentosCompanion.insert(
             id: id,
@@ -3370,7 +3382,7 @@ class $$AgendamentosTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable<$AgendamentosTable, Agendamento>(table),
+                    e.readTable<$AgendamentosTable, AgendamentoRegistro>(table),
                     $$AgendamentosTableReferences(db, table, e)
                   ))
               .toList(),
@@ -3420,8 +3432,8 @@ class $$AgendamentosTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (notasFiscaisRefs)
-                    await $_getPrefetchedData<Agendamento, $AgendamentosTable,
-                            NotasFiscai>(
+                    await $_getPrefetchedData<AgendamentoRegistro,
+                            $AgendamentosTable, NotaFiscalRegistro>(
                         currentTable: table,
                         referencedTable: $$AgendamentosTableReferences
                             ._notasFiscaisRefsTable(db),
@@ -3442,14 +3454,14 @@ class $$AgendamentosTableTableManager extends RootTableManager<
 typedef $$AgendamentosTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
     $AgendamentosTable,
-    Agendamento,
+    AgendamentoRegistro,
     $$AgendamentosTableFilterComposer,
     $$AgendamentosTableOrderingComposer,
     $$AgendamentosTableAnnotationComposer,
     $$AgendamentosTableCreateCompanionBuilder,
     $$AgendamentosTableUpdateCompanionBuilder,
-    (Agendamento, $$AgendamentosTableReferences),
-    Agendamento,
+    (AgendamentoRegistro, $$AgendamentosTableReferences),
+    AgendamentoRegistro,
     PrefetchHooks Function(
         {bool pacienteId, bool clinicaId, bool notasFiscaisRefs})>;
 typedef $$NotasFiscaisTableCreateCompanionBuilder = NotasFiscaisCompanion
@@ -3457,7 +3469,7 @@ typedef $$NotasFiscaisTableCreateCompanionBuilder = NotasFiscaisCompanion
   Value<int> id,
   required int pacienteId,
   Value<int?> agendamentoId,
-  required double valor,
+  Value<double> valor,
   Value<bool> emitida,
   Value<DateTime?> dataEmissao,
 });
@@ -3471,8 +3483,8 @@ typedef $$NotasFiscaisTableUpdateCompanionBuilder = NotasFiscaisCompanion
   Value<DateTime?> dataEmissao,
 });
 
-final class $$NotasFiscaisTableReferences
-    extends BaseReferences<_$AppDatabase, $NotasFiscaisTable, NotasFiscai> {
+final class $$NotasFiscaisTableReferences extends BaseReferences<_$AppDatabase,
+    $NotasFiscaisTable, NotaFiscalRegistro> {
   $$NotasFiscaisTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $PacientesTable _pacienteIdTable(_$AppDatabase db) =>
@@ -3694,14 +3706,14 @@ class $$NotasFiscaisTableAnnotationComposer
 class $$NotasFiscaisTableTableManager extends RootTableManager<
     _$AppDatabase,
     $NotasFiscaisTable,
-    NotasFiscai,
+    NotaFiscalRegistro,
     $$NotasFiscaisTableFilterComposer,
     $$NotasFiscaisTableOrderingComposer,
     $$NotasFiscaisTableAnnotationComposer,
     $$NotasFiscaisTableCreateCompanionBuilder,
     $$NotasFiscaisTableUpdateCompanionBuilder,
-    (NotasFiscai, $$NotasFiscaisTableReferences),
-    NotasFiscai,
+    (NotaFiscalRegistro, $$NotasFiscaisTableReferences),
+    NotaFiscalRegistro,
     PrefetchHooks Function({bool pacienteId, bool agendamentoId})> {
   $$NotasFiscaisTableTableManager(_$AppDatabase db, $NotasFiscaisTable table)
       : super(TableManagerState(
@@ -3733,7 +3745,7 @@ class $$NotasFiscaisTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             required int pacienteId,
             Value<int?> agendamentoId = const Value.absent(),
-            required double valor,
+            Value<double> valor = const Value.absent(),
             Value<bool> emitida = const Value.absent(),
             Value<DateTime?> dataEmissao = const Value.absent(),
           }) =>
@@ -3747,7 +3759,7 @@ class $$NotasFiscaisTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable<$NotasFiscaisTable, NotasFiscai>(table),
+                    e.readTable<$NotasFiscaisTable, NotaFiscalRegistro>(table),
                     $$NotasFiscaisTableReferences(db, table, e)
                   ))
               .toList(),
@@ -3803,14 +3815,14 @@ class $$NotasFiscaisTableTableManager extends RootTableManager<
 typedef $$NotasFiscaisTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
     $NotasFiscaisTable,
-    NotasFiscai,
+    NotaFiscalRegistro,
     $$NotasFiscaisTableFilterComposer,
     $$NotasFiscaisTableOrderingComposer,
     $$NotasFiscaisTableAnnotationComposer,
     $$NotasFiscaisTableCreateCompanionBuilder,
     $$NotasFiscaisTableUpdateCompanionBuilder,
-    (NotasFiscai, $$NotasFiscaisTableReferences),
-    NotasFiscai,
+    (NotaFiscalRegistro, $$NotasFiscaisTableReferences),
+    NotaFiscalRegistro,
     PrefetchHooks Function({bool pacienteId, bool agendamentoId})>;
 
 class $AppDatabaseManager {
