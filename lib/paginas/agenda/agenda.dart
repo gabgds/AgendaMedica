@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import '../../shared/estilo/estilo_texto.dart';
 import 'package:pex/shared/atendimento/atendimento.dart';
 import 'package:pex/shared/atendimento/modal_atendimento.dart';
-import 'package:pex/shared/atendimento/dados_em_memoria.dart';
+import 'package:pex/repositorios/agendamentos_repositorio.dart';
+import 'package:pex/repositorios/clinicas_repositorio.dart';
+import 'package:pex/repositorios/pacientes_repositorio.dart';
 import 'card_atendimento.dart';
-import 'dados_agenda_teste.dart';
 import 'seletor_dias.dart';
 import './formulario_agenda/modal_agendamento.dart';
-import './formulario_agenda/dados_agendamento_teste.dart';
 
 class Agenda extends StatefulWidget {
   const Agenda({super.key});
@@ -23,19 +23,31 @@ class _AgendaState extends State<Agenda> {
   @override
   void initState() {
     super.initState();
-    streamAtendimentos = criarStreamAgenda(dataSelecionada);
+    streamAtendimentos = observarAtendimentosDoDia(dataSelecionada);
   }
 
   void selecionarData(DateTime data) {
     setState(() {
       dataSelecionada = DateUtils.dateOnly(data);
-      streamAtendimentos = criarStreamAgenda(dataSelecionada);
+      streamAtendimentos = observarAtendimentosDoDia(dataSelecionada);
     });
   }
 
-  Future<void> adicionarAtendimento() async {
-    final pacientes = pacientesAgendamentoTeste;
-    final clinicas = clinicasAgendamentoTeste;
+  Future<void> agendarConsulta() async {
+    final pacientes = {
+      for (final paciente in await listarPacientes()) paciente.id: paciente.nome,
+    };
+    final clinicas = {
+      for (final clinica in await listarClinicas()) clinica.id: clinica.nome,
+    };
+    if (!mounted) return;
+    if (pacientes.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cadastre um paciente antes de agendar.')),
+      );
+      return;
+    }
+
     final consulta = await abrirModalAgendamento(
       context,
       dataInicial: dataSelecionada,
@@ -45,17 +57,8 @@ class _AgendaState extends State<Agenda> {
 
     if (!mounted || consulta == null) return;
 
-    adicionarAtendimentoEmMemoria(
-      pacienteId: consulta.pacienteId,
-      clinicaId: consulta.clinicaId,
-      nomePaciente: pacientes[consulta.pacienteId]!,
-      nomeClinica: consulta.clinicaId == null
-          ? ''
-          : clinicas[consulta.clinicaId]!,
-      dataHora: consulta.dataHora,
-      duracaoMinutos: consulta.duracaoMinutos,
-      emitirNotaFiscal: consulta.emitirNotaFiscal,
-    );
+    await adicionarAtendimento(consulta);
+    if (!mounted) return;
 
     selecionarData(consulta.dataHora);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -98,7 +101,7 @@ class _AgendaState extends State<Agenda> {
                 peso: FontWeight.bold,
               ),
               IconButton.filled(
-                onPressed: adicionarAtendimento,
+                onPressed: agendarConsulta,
                 tooltip: 'Adicionar atendimento',
                 style: IconButton.styleFrom(
                   backgroundColor: const Color(0xFF328783),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pex/database/status_agendamento.dart';
 import '../../shared/estilo/estilo_texto.dart';
 import '../../shared/funcoes/obter_iniciais.dart';
 import '../../shared/funcoes/gerar_cor_avatar.dart';
@@ -98,7 +99,7 @@ class CardAtendimento extends StatelessWidget {
   }
 
   Widget etiqueta() {
-    final concluido = atendimento.status == 'Concluído';
+    final concluido = atendimento.status == StatusAgendamento.concluido;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

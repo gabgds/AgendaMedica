@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pex/database/status_agendamento.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 import '../../shared/funcoes/obter_iniciais.dart';
 import '../../shared/funcoes/gerar_cor_avatar.dart';
@@ -45,7 +46,7 @@ class ItemAtendimento extends StatelessWidget {
       trailing: Icon(
         Icons.circle,
         size: 10,
-        color: atendimento.status == 'Concluído'
+        color: atendimento.status == StatusAgendamento.concluido
             ? const Color(0xFF1B8780)
             : const Color(0xFFFF914D),
       ),

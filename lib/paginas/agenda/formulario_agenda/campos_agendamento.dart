@@ -14,6 +14,7 @@ class CamposAgendamento extends StatelessWidget {
     required this.dataController,
     required this.horarioController,
     required this.duracaoController,
+    required this.salaController,
     required this.aoSelecionarPaciente,
     required this.aoSelecionarClinica,
     required this.aoSelecionarNotaFiscal,
@@ -29,6 +30,7 @@ class CamposAgendamento extends StatelessWidget {
   final TextEditingController dataController;
   final TextEditingController horarioController;
   final TextEditingController duracaoController;
+  final TextEditingController salaController;
   final ValueChanged<int?> aoSelecionarPaciente;
   final ValueChanged<int?> aoSelecionarClinica;
   final ValueChanged<bool> aoSelecionarNotaFiscal;
@@ -57,6 +59,10 @@ class CamposAgendamento extends StatelessWidget {
           clinicaId,
           aoSelecionarClinica,
         ),
+        if (clinicaId != null && clinicaId != 0) ...[
+          const SizedBox(height: 28),
+          campoSala(),
+        ],
         const SizedBox(height: 28),
         campoDuracao(),
         const SizedBox(height: 28),
@@ -116,6 +122,14 @@ class CamposAgendamento extends StatelessWidget {
         }
         return null;
       },
+    );
+  }
+
+  Widget campoSala() {
+    return TextFormField(
+      controller: salaController,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: decoracao('SALA (OPCIONAL)'),
     );
   }
 
