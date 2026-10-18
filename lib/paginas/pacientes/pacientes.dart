@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
+import 'package:pex/repositorios/pacientes_repositorio.dart';
 import 'paciente.dart';
-import 'dados_pacientes_em_memoria.dart';
 import 'cabecalho_pacientes.dart';
 import 'card_paciente.dart';
-import 'dados_pacientes_teste.dart';
 import 'formulario_paciente/modal_paciente.dart';
 import 'perfil_paciente/modal_perfil_paciente.dart';
 
 class Pacientes extends StatefulWidget {
   const Pacientes({
     super.key,
-    this.pacientes = pacientesTeste,
     this.aoAdicionar,
     this.aoAbrirPaciente,
     this.aoAbrirNotasFiscais,
   });
 
-  final List<Paciente> pacientes;
   final VoidCallback? aoAdicionar;
   final ValueChanged<Paciente>? aoAbrirPaciente;
   final ValueChanged<Paciente>? aoAbrirNotasFiscais;
@@ -30,8 +27,9 @@ class _PacientesState extends State<Pacientes> {
   String busca = '';
   bool cadastroAberto = false;
   bool perfilAberto = false;
+  late final streamPacientes = observarPacientes();
 
-  Future<void> adicionarPaciente() async {
+  Future<void> cadastrarPaciente() async {
     if (widget.aoAdicionar != null) {
       widget.aoAdicionar!();
       return;
@@ -43,11 +41,14 @@ class _PacientesState extends State<Pacientes> {
       final novo = await abrirModalPaciente(context);
       if (!mounted || novo == null) return;
 
-      final paciente = novo.paraPaciente(
-        id: proximoIdPacienteEmMemoria(widget.pacientes),
-      );
-
-      setState(() => adicionarPacienteEmMemoria(paciente));
+      try {
+        await adicionarPaciente(novo);
+      } on CpfJaCadastrado catch (erro) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(erro.toString())),
+        );
+      }
     } finally {
       cadastroAberto = false;
     }
@@ -67,8 +68,6 @@ class _PacientesState extends State<Pacientes> {
         paciente: paciente,
         aoAbrirNotasFiscais: widget.aoAbrirNotasFiscais,
       );
-      if (!mounted) return;
-      setState(() {});
     } finally {
       perfilAberto = false;
     }
@@ -78,10 +77,10 @@ class _PacientesState extends State<Pacientes> {
     setState(() => busca = texto);
   }
 
-  List<Paciente> filtrarPacientes() {
+  List<Paciente> filtrarPacientes(List<Paciente> todos) {
     final texto = busca.trim().toLowerCase();
 
-    return pacientesEmMemoria(widget.pacientes).where((paciente) {
+    return todos.where((paciente) {
       return paciente.nome.toLowerCase().contains(texto) ||
           paciente.telefone.contains(texto);
     }).toList();
@@ -89,16 +88,29 @@ class _PacientesState extends State<Pacientes> {
 
   @override
   Widget build(BuildContext context) {
-    final pacientes = filtrarPacientes();
-
     return Column(
       children: [
         CabecalhoPacientes(
           aoBuscar: buscarPaciente,
-          aoAdicionar: adicionarPaciente,
+          aoAdicionar: cadastrarPaciente,
         ),
         const Divider(height: 1, color: Color(0xFFEAEAEA)),
-        Expanded(child: conteudo(pacientes)),
+        Expanded(
+          child: StreamBuilder<List<Paciente>>(
+            stream: streamPacientes,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return const Center(
+                  child: Text('Não foi possível carregar os pacientes.'),
+                );
+              }
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return conteudo(filtrarPacientes(snapshot.data!));
+            },
+          ),
+        ),
       ],
     );
   }

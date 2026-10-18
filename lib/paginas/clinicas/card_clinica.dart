@@ -32,14 +32,6 @@ class CardClinica extends StatelessWidget {
                   cor: Colors.grey,
                   tamanho: 14,
                 ),
-                const SizedBox(height: 4),
-                TextoComEstilo(
-                  clinica.telefone.isEmpty
-                      ? 'Telefone não informado'
-                      : clinica.telefone,
-                  cor: Colors.grey,
-                  tamanho: 14,
-                ),
               ],
             ),
           ),

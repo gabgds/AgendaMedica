@@ -7,6 +7,8 @@ class Paciente {
     this.cpf = '',
     this.endereco = '',
     this.email = '',
+    this.clinicaId,
+    this.nomeClinica = '',
   });
 
   final int id;
@@ -16,6 +18,8 @@ class Paciente {
   final String cpf;
   final String endereco;
   final String email;
+  final int? clinicaId;
+  final String nomeClinica;
 
   String get telefoneFormatado {
     final numeros = telefone.replaceAll(RegExp(r'\D'), '');
@@ -23,5 +27,16 @@ class Paciente {
     final ddd = numeros.substring(0, 2);
     final corte = numeros.length - 4;
     return '($ddd) ${numeros.substring(2, corte)}-${numeros.substring(corte)}';
+  }
+
+  int? idade([DateTime? referencia]) {
+    final nascimento = dataNascimento;
+    if (nascimento == null) return null;
+    final hoje = referencia ?? DateTime.now();
+    var anos = hoje.year - nascimento.year;
+    final fezAniversario = hoje.month > nascimento.month ||
+        (hoje.month == nascimento.month && hoje.day >= nascimento.day);
+    if (!fezAniversario) anos--;
+    return anos;
   }
 }

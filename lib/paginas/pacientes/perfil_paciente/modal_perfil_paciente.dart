@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pex/repositorios/agendamentos_repositorio.dart';
+import 'package:pex/repositorios/pacientes_repositorio.dart';
 import 'package:pex/shared/atendimento/atendimento.dart';
-import 'package:pex/shared/atendimento/dados_em_memoria.dart';
 import 'package:pex/shared/atendimento/modal_notas_fiscais.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
-import '../dados_pacientes_em_memoria.dart';
 import '../paciente.dart';
 import '../formulario_paciente/modal_paciente.dart';
 import 'acoes_perfil_paciente.dart';
@@ -40,14 +40,21 @@ class ModalPerfilPaciente extends StatefulWidget {
 class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
   late Paciente paciente;
   bool acaoAberta = false;
-  late final streamNotasFiscais = observarDadosEmMemoria(
-    () => notasFiscaisEmMemoria(pacienteId: widget.paciente.id),
+  late final streamPaciente = observarPaciente(widget.paciente.id);
+  late final streamNotasFiscais = observarNotasFiscais(
+    pacienteId: widget.paciente.id,
   );
 
   @override
   void initState() {
     super.initState();
     paciente = widget.paciente;
+  }
+
+  void mostrarMensagem(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensagem)),
+    );
   }
 
   Future<void> editarPaciente() async {
@@ -60,15 +67,15 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
       );
       if (!mounted || dados == null) return;
 
-      final atualizado = dados.paraPaciente(id: paciente.id);
-      atualizarPacienteEmMemoria(atualizado);
-      setState(() => paciente = atualizado);
+      await atualizarPaciente(paciente.id, dados);
+    } on CpfJaCadastrado catch (erro) {
+      if (mounted) mostrarMensagem(erro.toString());
     } finally {
       acaoAberta = false;
     }
   }
 
-  Future<void> removerPaciente() async {
+  Future<void> confirmarRemocao() async {
     if (acaoAberta) return;
     acaoAberta = true;
     try {
@@ -76,7 +83,10 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
         context: context,
         builder: (contextDialogo) => AlertDialog(
           title: const Text('Remover paciente?'),
-          content: Text('Deseja remover ${paciente.nome} da lista de pacientes?'),
+          content: Text(
+            'Deseja remover ${paciente.nome} da lista de pacientes? '
+            'Os agendamentos deste paciente também serão removidos.',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(contextDialogo, false),
@@ -94,17 +104,17 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
       );
       if (!mounted || confirmado != true) return;
 
-      removerPacienteEmMemoria(paciente.id);
-      Navigator.pop(context);
+      await removerPaciente(paciente.id);
+      if (mounted) Navigator.pop(context);
+    } on PacienteComNotaPendente catch (erro) {
+      if (mounted) mostrarMensagem(erro.toString());
     } finally {
       acaoAberta = false;
     }
   }
 
   Future<void> abrirNotasFiscais() async {
-    if (acaoAberta || notasFiscaisEmMemoria(pacienteId: paciente.id).isEmpty) {
-      return;
-    }
+    if (acaoAberta) return;
     acaoAberta = true;
     try {
       if (widget.aoAbrirNotasFiscais != null) {
@@ -120,19 +130,25 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
 
   @override
   Widget build(BuildContext context) {
-    return ModalFormulario(
-      titulo: paciente.nome,
-      conteudo: InformacoesPerfilPaciente(paciente: paciente),
-      rodape: StreamBuilder<List<Atendimento>>(
-        stream: streamNotasFiscais,
-        initialData: notasFiscaisEmMemoria(pacienteId: paciente.id),
-        builder: (context, snapshot) => AcoesPerfilPaciente(
-          possuiNotasFiscais: snapshot.data?.isNotEmpty ?? false,
-          aoAbrirNotasFiscais: abrirNotasFiscais,
-          aoEditar: editarPaciente,
-          aoRemover: removerPaciente,
-        ),
-      ),
+    return StreamBuilder<Paciente?>(
+      stream: streamPaciente,
+      initialData: widget.paciente,
+      builder: (context, snapshot) {
+        paciente = snapshot.data ?? paciente;
+        return ModalFormulario(
+          titulo: paciente.nome,
+          conteudo: InformacoesPerfilPaciente(paciente: paciente),
+          rodape: StreamBuilder<List<Atendimento>>(
+            stream: streamNotasFiscais,
+            builder: (context, snapshot) => AcoesPerfilPaciente(
+              possuiNotasFiscais: snapshot.data?.isNotEmpty ?? false,
+              aoAbrirNotasFiscais: abrirNotasFiscais,
+              aoEditar: editarPaciente,
+              aoRemover: confirmarRemocao,
+            ),
+          ),
+        );
+      },
     );
   }
 }

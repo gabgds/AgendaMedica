@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
 import 'clinica.dart';
-import 'dados_clinicas_em_memoria.dart';
+import 'package:pex/repositorios/clinicas_repositorio.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 import 'cabecalho_clinicas.dart';
 import 'card_clinica.dart';
-import 'dados_clinicas_teste.dart';
 import 'formulario_clinica/modal_clinica.dart';
 import 'perfil_clinica/modal_perfil_clinica.dart';
 
 class Clinicas extends StatefulWidget {
   const Clinicas({
     super.key,
-    this.clinicas = clinicasTeste,
     this.aoAdicionar,
     this.aoAbrirClinica,
   });
 
-  final List<Clinica> clinicas;
   final VoidCallback? aoAdicionar;
   final ValueChanged<Clinica>? aoAbrirClinica;
 
@@ -28,27 +25,22 @@ class _ClinicasState extends State<Clinicas> {
   String busca = '';
   bool cadastroAberto = false;
   bool detalhesAbertos = false;
+  late final streamClinicas = observarClinicas();
 
   void buscarClinica(String texto) {
     setState(() => busca = texto);
   }
 
-  List<Clinica> filtrarClinicas() {
+  List<Clinica> filtrarClinicas(List<Clinica> todas) {
     final texto = busca.trim().toLowerCase();
-    final numeros = texto.replaceAll(RegExp(r'\D'), '');
-    final buscaTelefone = numeros.isNotEmpty &&
-        RegExp(r'^[0-9()\s.+-]+$').hasMatch(texto);
 
-    return clinicasEmMemoria(widget.clinicas).where((clinica) {
+    return todas.where((clinica) {
       return clinica.nome.toLowerCase().contains(texto) ||
-          clinica.endereco.toLowerCase().contains(texto) ||
-          clinica.telefone.contains(texto) ||
-          (buscaTelefone &&
-              clinica.telefone.replaceAll(RegExp(r'\D'), '').contains(numeros));
+          clinica.endereco.toLowerCase().contains(texto);
     }).toList();
   }
 
-  Future<void> adicionarClinica() async {
+  Future<void> cadastrarClinica() async {
     if (widget.aoAdicionar != null) {
       widget.aoAdicionar!();
       return;
@@ -59,10 +51,7 @@ class _ClinicasState extends State<Clinicas> {
     try {
       final nova = await abrirModalClinica(context);
       if (!mounted || nova == null) return;
-      final clinica = nova.paraClinica(
-        id: proximoIdClinicaEmMemoria(widget.clinicas),
-      );
-      setState(() => adicionarClinicaEmMemoria(clinica));
+      await adicionarClinica(nova);
     } finally {
       cadastroAberto = false;
     }
@@ -78,8 +67,6 @@ class _ClinicasState extends State<Clinicas> {
 
     try {
       await abrirModalPerfilClinica(context, clinica: clinica);
-      if (!mounted) return;
-      setState(() {});
     } finally {
       detalhesAbertos = false;
     }
@@ -87,15 +74,29 @@ class _ClinicasState extends State<Clinicas> {
 
   @override
   Widget build(BuildContext context) {
-    final clinicas = filtrarClinicas();
     return Column(
       children: [
         CabecalhoClinicas(
           aoBuscar: buscarClinica,
-          aoAdicionar: adicionarClinica,
+          aoAdicionar: cadastrarClinica,
         ),
         const Divider(height: 1, color: Color(0xFFEAEAEA)),
-        Expanded(child: conteudo(clinicas)),
+        Expanded(
+          child: StreamBuilder<List<Clinica>>(
+            stream: streamClinicas,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return const Center(
+                  child: Text('Não foi possível carregar as clínicas.'),
+                );
+              }
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return conteudo(filtrarClinicas(snapshot.data!));
+            },
+          ),
+        ),
       ],
     );
   }
