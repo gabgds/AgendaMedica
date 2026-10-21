@@ -6,11 +6,9 @@ import 'card_sair.dart';
 import 'edicao_perfil.dart';
 import 'modal_editar_perfil.dart';
 
-// O Scaffold e a barra de navegação são fornecidos por Inicio.
 class Opcoes extends StatefulWidget {
   const Opcoes({super.key, this.aoEditarPerfil});
 
-  // Entrega os dados do formulário para futura integração com a autenticação.
   final ValueChanged<EdicaoPerfil>? aoEditarPerfil;
 
   @override
@@ -41,7 +39,6 @@ class _OpcoesState extends State<Opcoes> {
     if (saindo) return;
     saindo = true;
     limparPerfilEmMemoria();
-    // A rota reutiliza TelaInicial, que já contém o Scaffold do login.
     Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil<void>(
       '/login',
       (route) => false,

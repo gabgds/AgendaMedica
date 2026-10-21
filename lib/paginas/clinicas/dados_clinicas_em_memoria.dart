@@ -1,7 +1,3 @@
-// PROVISÓRIO: os cadastros de clínicas ficam apenas na memória.
-// Os dados são perdidos ao encerrar o aplicativo.
-// Substituir por consultas e gravações no banco de dados com Drift.
-
 import 'clinica.dart';
 
 final _clinicasCadastradas = <Clinica>[];
@@ -31,7 +27,6 @@ void atualizarClinicaEmMemoria(Clinica clinica) {
 }
 
 void removerClinicaEmMemoria(int clinicaId) {
-  // Remove também exemplos da lista inicial, sem modificar a lista constante.
   _clinicasRemovidas.add(clinicaId);
   _clinicasEditadas.remove(clinicaId);
 }
@@ -47,6 +42,5 @@ int proximoIdClinicaEmMemoria(List<Clinica> clinicasIniciais) {
   for (final id in ids) {
     if (id > maiorId) maiorId = id;
   }
-  // Mantém os IDs únicos mesmo depois de remover a clínica com o maior ID.
   return maiorId + 1;
 }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Abre um modal para qualquer formulário e devolve o resultado ao fechar.
-// O formulário define o tipo T e entrega o resultado com Navigator.pop.
 Future<T?> abrirModalFormulario<T>(
   BuildContext context, {
   required WidgetBuilder builder,
@@ -19,8 +17,6 @@ Future<T?> abrirModalFormulario<T>(
   );
 }
 
-// Estrutura reutilizável: cabeçalho com seta, conteúdo rolável e rodapé opcional.
-// Cada tela fornece seu título, seus campos e seus botões.
 class ModalFormulario extends StatelessWidget {
   const ModalFormulario({
     super.key,
@@ -38,7 +34,6 @@ class ModalFormulario extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      // Mantém o formulário e o botão acima do teclado.
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.94,

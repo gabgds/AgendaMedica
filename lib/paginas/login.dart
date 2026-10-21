@@ -29,7 +29,6 @@ class _LoginState extends State<Login> {
       return;
     }
 
-    // Coloque a autenticação aqui quando conectar o login.
     iniciarPerfilEmMemoria(email: emailController.text.trim());
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Campos válidos!')),

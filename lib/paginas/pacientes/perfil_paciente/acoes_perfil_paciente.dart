@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/botões/botao.dart';
 
-// O botão de notas depende das consultas do paciente que solicitam emissão.
 class AcoesPerfilPaciente extends StatelessWidget {
   const AcoesPerfilPaciente({
     super.key,

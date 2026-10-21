@@ -1,7 +1,3 @@
-// PROVISÓRIO: atendimentos e notas fiscais ficam apenas na memória.
-// Os dados são perdidos ao encerrar o aplicativo.
-// Substituir por consultas e gravações no banco de dados com Drift.
-
 import 'dart:async';
 import './atendimento.dart';
 
@@ -42,7 +38,6 @@ final _atendimentos = <Atendimento>[
   ),
 ];
 
-// IDs temporários para identificar os novos atendimentos durante a execução.
 int _proximoId = 4;
 final _alteracoes = StreamController<void>.broadcast();
 
@@ -68,7 +63,6 @@ void adicionarAtendimentoEmMemoria({
     emitirNotaFiscal: emitirNotaFiscal,
   ));
 
-  // Avisa os streams para atualizarem a lista, os contadores e o próximo card.
   _alteracoes.add(null);
 }
 
@@ -142,7 +136,6 @@ List<Atendimento> notasFiscaisEmMemoria({
   int? pacienteId,
   bool apenasPendentes = false,
 }) {
-  // Consulta todos os dias: uma nota pendente não desaparece ao virar a data.
   final notas = _atendimentos.where((atendimento) {
     return atendimento.status != 'Cancelado' &&
         atendimento.emitirNotaFiscal &&
@@ -166,8 +159,6 @@ List<Atendimento> atendimentosDoDia(DateTime data) {
   return atendimentos;
 }
 
-// Entrega os dados atuais ao ouvir o stream e novamente quando a lista mudar.
-// Cada ouvinte tem sua assinatura, cancelada ao sair da tela.
 Stream<T> observarDadosEmMemoria<T>(T Function() consultar) {
   return Stream<T>.multi((controller) {
     final assinatura = _alteracoes.stream.listen((_) {

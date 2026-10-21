@@ -1,7 +1,3 @@
-// PROVISÓRIO: o perfil do usuário é mantido apenas na memória.
-// Carregar e salvar os dados do perfil no banco de dados com Drift.
-// Manter em memória somente o estado da sessão.
-
 import 'perfil_usuario.dart';
 
 PerfilUsuario _perfil = const PerfilUsuario();

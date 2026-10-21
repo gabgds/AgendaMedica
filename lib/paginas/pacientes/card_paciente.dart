@@ -5,7 +5,6 @@ import 'package:pex/shared/funcoes/obter_iniciais.dart';
 import 'paciente.dart';
 import 'package:pex/shared/listagem/card_listagem.dart';
 
-// Card com a identificação do paciente e espaço para uma ação ao clicar.
 class CardPaciente extends StatelessWidget {
   const CardPaciente({
     super.key,

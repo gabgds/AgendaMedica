@@ -4,7 +4,6 @@ import 'package:pex/shared/estilo/estilo_texto.dart';
 import 'package:pex/shared/funcoes/gerar_cor_avatar.dart';
 import 'package:pex/shared/funcoes/obter_iniciais.dart';
 
-// Cabeçalho do modal: seta de voltar, status e identificação do paciente.
 class CabecalhoAtendimento extends StatelessWidget {
   const CabecalhoAtendimento({super.key, required this.atendimento});
 

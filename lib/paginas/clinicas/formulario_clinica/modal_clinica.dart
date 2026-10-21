@@ -17,7 +17,6 @@ Future<NovaClinica?> abrirModalClinica(
   );
 }
 
-// O mesmo formulário serve para cadastrar e editar uma clínica.
 class ModalClinica extends StatefulWidget {
   const ModalClinica({super.key, this.clinicaInicial});
 

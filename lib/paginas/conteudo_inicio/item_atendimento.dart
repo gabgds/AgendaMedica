@@ -1,5 +1,3 @@
-// Isso aqui foi usado no dados_para_teste.dart
-
 import 'package:flutter/material.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 import '../../shared/funcoes/obter_iniciais.dart';

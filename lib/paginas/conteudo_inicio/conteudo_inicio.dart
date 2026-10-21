@@ -21,33 +21,18 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
   static const ciano_escuro = Color(0xFF00635F);
   static const laranja = Color(0xFFFF914D);
 
-  // essas três variáveis stream vem do dados_para_teste.dart
   late final streamContadores = criarStreamContadores();
 
   late final streamProximoAtendimento =
   criarStreamProximoAtendimento();
 
-
   late final streamAgenda = criarStreamAgendaHoje(
-    // Agora recebemos objetos Atendimento e montamos os widgets no builder.
-    // cria uma lista de atendimentos
-    // [
-    // ItemAtendimento(...),
-    // ItemAtendimento(...),
-    // ]
   );
 
   void abrirAtendimento(Atendimento atendimento) {
-    // O futuro modal pode receber atendimento ou consultar atendimento.id.
     abrirModalAtendimento(context, atendimento: atendimento);
   }
 
-  // Os snapshots são as informações mais recentes nas variáveis stream
-
-  // Esse primeiro Widget junta tudo, a página do início é formado por:
-  // resumo() - parte com fundo verde, que mostra o dia atual e os contadores
-  // proximoAtendimento() - Card que sobrepõe o resumo()
-  // agendaHoje() - Card que mostra os agendamentos de hoje, se tiver algum
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -76,7 +61,6 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
     );
   }
 
-  // Dia atual e contadores
   Widget resumo() {
     return Container(
       width: double.infinity,
@@ -100,7 +84,6 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
     );
   }
 
-  // Quantidade de atendimentos de hoje, concluídos e restantes, dentro dos retângulos
   Widget cardsResumo() {
     return StreamBuilder<Map<String, int>>(
       stream: streamContadores,
@@ -151,7 +134,6 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
     );
   }
 
-  // Card que mostra o próximo atendimento
   Widget proximoAtendimento() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
@@ -183,7 +165,6 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
     );
   }
 
-  // Lista dos atendimentos do dia
   Widget agendaHoje() {
     return StreamBuilder<List<Atendimento>>(
       stream: streamAgenda,

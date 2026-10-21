@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 import '../paciente.dart';
 
-// Card de informações do paciente, com os dados capturados no cadastro.
 class InformacoesPerfilPaciente extends StatelessWidget {
   const InformacoesPerfilPaciente({super.key, required this.paciente});
 

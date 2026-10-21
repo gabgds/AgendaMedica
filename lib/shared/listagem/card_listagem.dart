@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Aparência e toque compartilhados; cada lista fornece o conteúdo do card.
 class CardListagem extends StatelessWidget {
   const CardListagem({
     super.key,

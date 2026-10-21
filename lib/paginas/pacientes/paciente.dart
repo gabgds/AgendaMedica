@@ -1,4 +1,3 @@
-// Modelo com os dados do paciente exibidos pelas telas.
 class Paciente {
   const Paciente({
     required this.id,

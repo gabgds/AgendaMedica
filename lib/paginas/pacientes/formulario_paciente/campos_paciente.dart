@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:pex/shared/formulario/campo_formulario.dart';
 import 'package:pex/shared/formulario/validacoes_login_cadastro.dart';
 
-// O modal guarda os valores; este componente monta e valida os campos.
 class CamposPaciente extends StatelessWidget {
   const CamposPaciente({
     super.key,

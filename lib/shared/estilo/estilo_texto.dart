@@ -1,5 +1,3 @@
-// Fiz isso pra reduzir identação em algumas partes - Gustavo
-
 import 'package:flutter/material.dart';
 
 class TextoComEstilo extends StatelessWidget {

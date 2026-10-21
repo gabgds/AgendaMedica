@@ -1,6 +1,3 @@
-// PROVISÓRIO: clínicas fictícias usadas pelas telas.
-// Substituir esta lista por clínicas carregadas do banco com Drift.
-
 import 'clinica.dart';
 
 const clinicasTeste = <Clinica>[
