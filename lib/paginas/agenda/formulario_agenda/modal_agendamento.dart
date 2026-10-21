@@ -46,6 +46,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
   final dataController = TextEditingController();
   final horarioController = TextEditingController();
   final duracaoController = TextEditingController();
+  final salaController = TextEditingController();
 
   int? pacienteId;
   int? clinicaId;
@@ -67,6 +68,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
       horarioSelecionado = TimeOfDay.fromDateTime(atendimento.dataHora);
       horarioController.text = atendimento.horario;
       duracaoController.text = atendimento.duracaoMinutos.toString();
+      salaController.text = atendimento.sala;
     }
     atualizarTextoData();
   }
@@ -76,6 +78,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
     dataController.dispose();
     horarioController.dispose();
     duracaoController.dispose();
+    salaController.dispose();
     super.dispose();
   }
 
@@ -140,6 +143,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
       ),
       duracaoMinutos: int.parse(duracaoController.text),
       emitirNotaFiscal: emitirNotaFiscal!,
+      sala: clinicaId == 0 ? '' : salaController.text.trim(),
     ));
   }
 
@@ -172,6 +176,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
         dataController: dataController,
         horarioController: horarioController,
         duracaoController: duracaoController,
+        salaController: salaController,
         aoSelecionarPaciente: (id) => setState(() => pacienteId = id),
         aoSelecionarClinica: (id) => setState(() => clinicaId = id),
         aoSelecionarNotaFiscal: (valor) =>

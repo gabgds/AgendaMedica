@@ -3,7 +3,7 @@ import 'data_atual.dart';
 import 'card_agenda.dart';
 import 'contador_resumo.dart';
 import 'card_proximo_atendimento.dart';
-import 'dados_para_teste.dart';
+import 'dados_inicio.dart';
 import 'item_atendimento.dart';
 import 'aviso_notas_fiscais.dart';
 import 'package:pex/shared/atendimento/atendimento.dart';
@@ -17,8 +17,8 @@ class ConteudoInicio extends StatefulWidget {
 }
 
 class _ConteudoInicioState extends State<ConteudoInicio> {
-  static const ciano_claro = Color(0xFF00D6D0);
-  static const ciano_escuro = Color(0xFF00635F);
+  static const cianoClaro = Color(0xFF00D6D0);
+  static const cianoEscuro = Color(0xFF00635F);
   static const laranja = Color(0xFFFF914D);
 
   late final streamContadores = criarStreamContadores();
@@ -43,7 +43,7 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
               Positioned.fill(
                 bottom: 100,
                 child: Container(
-                  color: ciano_escuro,
+                  color: cianoEscuro,
                 ),
               ),
               Column(
@@ -65,7 +65,7 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      color: ciano_escuro,
+      color: cianoEscuro,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +73,7 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
           Text(
             dataAtual(),
             style: const TextStyle(
-              color: ciano_claro,
+              color: cianoClaro,
               fontSize: 18,
             ),
           ),
@@ -117,7 +117,7 @@ class _ConteudoInicioState extends State<ConteudoInicio> {
               child: ContadorResumo(
                 titulo: 'Concluídos',
                 quantidade: concluidos,
-                cor: ciano_claro,
+                cor: cianoClaro,
               ),
             ),
             const SizedBox(width: 14),

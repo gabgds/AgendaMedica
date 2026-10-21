@@ -20,8 +20,6 @@ class InformacoesPerfilClinica extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           informacao('ENDEREÇO', clinica.endereco),
-          const SizedBox(height: 16),
-          informacao('TELEFONE', clinica.telefone),
         ],
       ),
     );

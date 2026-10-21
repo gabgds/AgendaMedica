@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pex/repositorios/agendamentos_repositorio.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
 import 'package:pex/shared/listagem/card_listagem.dart';
 import 'atendimento.dart';
-import 'dados_em_memoria.dart';
 
 Future<void> abrirModalNotasFiscais(
   BuildContext context, {
@@ -33,13 +33,11 @@ class ModalNotasFiscais extends StatefulWidget {
 }
 
 class _ModalNotasFiscaisState extends State<ModalNotasFiscais> {
-  late final streamNotas = observarDadosEmMemoria(consultarNotas);
-  bool confirmandoEmissao = false;
-
-  List<Atendimento> consultarNotas() => notasFiscaisEmMemoria(
+  late final streamNotas = observarNotasFiscais(
     pacienteId: widget.pacienteId,
     apenasPendentes: widget.apenasPendentes,
   );
+  bool confirmandoEmissao = false;
 
   Future<void> marcarComoEmitida(Atendimento atendimento) async {
     if (confirmandoEmissao) return;
@@ -67,7 +65,7 @@ class _ModalNotasFiscaisState extends State<ModalNotasFiscais> {
         ),
       );
       if (!mounted || confirmado != true) return;
-      if (!marcarNotaFiscalEmitidaEmMemoria(atendimento.id)) return;
+      if (!await marcarNotaFiscalEmitida(atendimento.id) || !mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nota fiscal marcada como emitida.')),
       );
@@ -88,10 +86,12 @@ class _ModalNotasFiscaisState extends State<ModalNotasFiscais> {
       titulo: widget.apenasPendentes ? 'Notas fiscais pendentes' : 'Notas fiscais',
       conteudo: StreamBuilder<List<Atendimento>>(
         stream: streamNotas,
-        initialData: consultarNotas(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Text('Não foi possível carregar as notas fiscais.');
+          }
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
           }
           final notas = snapshot.data ?? <Atendimento>[];
           if (notas.isEmpty) {

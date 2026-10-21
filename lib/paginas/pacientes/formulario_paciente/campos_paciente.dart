@@ -13,6 +13,9 @@ class CamposPaciente extends StatelessWidget {
     required this.emailController,
     required this.telefoneController,
     required this.escolherData,
+    required this.clinicas,
+    required this.clinicaId,
+    required this.aoSelecionarClinica,
   });
 
   final TextEditingController nomeController;
@@ -22,6 +25,9 @@ class CamposPaciente extends StatelessWidget {
   final TextEditingController emailController;
   final TextEditingController telefoneController;
   final VoidCallback escolherData;
+  final Map<int, String> clinicas;
+  final int? clinicaId;
+  final ValueChanged<int?> aoSelecionarClinica;
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +107,26 @@ class CamposPaciente extends StatelessWidget {
             LengthLimitingTextInputFormatter(11),
           ],
         ),
+        const SizedBox(height: 28),
+        seletorClinica(),
       ],
+    );
+  }
+
+  Widget seletorClinica() {
+    final opcoes = {0: 'Avulso', ...clinicas};
+    return DropdownButtonFormField<int>(
+      key: ValueKey(opcoes.keys.join(',')),
+      initialValue: opcoes.containsKey(clinicaId) ? clinicaId : null,
+      isExpanded: true,
+      decoration: decoracaoCampoFormulario('CLÍNICA', compacto: true),
+      icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+      items: [
+        for (final opcao in opcoes.entries)
+          DropdownMenuItem(value: opcao.key, child: Text(opcao.value)),
+      ],
+      onChanged: aoSelecionarClinica,
+      validator: (valor) => valor == null ? 'Selecione a clínica ou Avulso' : null,
     );
   }
 

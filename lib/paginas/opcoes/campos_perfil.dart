@@ -6,13 +6,13 @@ class CamposPerfil extends StatelessWidget {
   const CamposPerfil({
     super.key,
     required this.nomeController,
-    required this.emailController,
+    required this.usuarioController,
     required this.senhaController,
     required this.confirmacaoController,
   });
 
   final TextEditingController nomeController;
-  final TextEditingController emailController;
+  final TextEditingController usuarioController;
   final TextEditingController senhaController;
   final TextEditingController confirmacaoController;
 
@@ -32,11 +32,10 @@ class CamposPerfil extends StatelessWidget {
         ),
         const SizedBox(height: 26),
         FormInput(
-          'EMAIL',
-          controller: emailController,
-          teclado: TextInputType.emailAddress,
+          'USUÁRIO',
+          controller: usuarioController,
           textInputAction: TextInputAction.next,
-          validator: validarEmail,
+          validator: validarUsuario,
         ),
         const SizedBox(height: 26),
         FormInput(
@@ -44,7 +43,8 @@ class CamposPerfil extends StatelessWidget {
           senha: true,
           controller: senhaController,
           textInputAction: TextInputAction.next,
-          validator: (valor) => alterandoSenha ? validarSenha(valor) : null,
+          validator: (valor) =>
+              alterandoSenha ? validarSenhaCadastro(valor) : null,
         ),
         const SizedBox(height: 26),
         FormInput(

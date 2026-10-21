@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'database/app_database.dart';
+import 'paginas/inicio.dart';
 import 'paginas/login.dart';
+import 'shared/usuario/sessao.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await restaurarSessao();
   runApp(const MinhaAgendaApp());
 }
 
@@ -20,38 +23,19 @@ class MinhaAgendaApp extends StatelessWidget {
       routes: {
         '/login': (context) => const TelaInicial(),
       },
-      home: const TelaInicial(),
+      home: medicoLogado == null ? const TelaInicial() : const Inicio(),
     );
   }
 }
 
-class TelaInicial extends StatefulWidget {
+class TelaInicial extends StatelessWidget {
   const TelaInicial({super.key});
 
   @override
-  State<TelaInicial> createState() => _TelaInicialState();
-}
-
-class _TelaInicialState extends State<TelaInicial> {
-  late AppDatabase database;
-
-  @override
-  void initState() {
-    super.initState();
-    database = AppDatabase();
-  }
-
-  @override
-  void dispose() {
-    database.close();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.white,
-      body: const Center(
+      body: Center(
         child: Login(),
       ),
     );

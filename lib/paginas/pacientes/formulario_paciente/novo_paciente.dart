@@ -8,6 +8,7 @@ class NovoPaciente {
     required this.endereco,
     required this.email,
     required this.telefone,
+    this.clinicaId,
   });
 
   final String nome;
@@ -16,8 +17,9 @@ class NovoPaciente {
   final String endereco;
   final String email;
   final String telefone;
+  final int? clinicaId;
 
-  Paciente paraPaciente({required int id}) {
+  Paciente paraPaciente({required int id, String nomeClinica = ''}) {
     return Paciente(
       id: id,
       nome: nome,
@@ -26,6 +28,8 @@ class NovoPaciente {
       cpf: cpf,
       endereco: endereco,
       email: email,
+      clinicaId: clinicaId,
+      nomeClinica: clinicaId == null ? '' : nomeClinica,
     );
   }
 }

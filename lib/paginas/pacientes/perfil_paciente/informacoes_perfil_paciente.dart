@@ -21,13 +21,18 @@ class InformacoesPerfilPaciente extends StatelessWidget {
         children: [
           informacao('TELEFONE', paciente.telefoneFormatado),
           const SizedBox(height: 16),
-          informacao('NASCIMENTO', formatarData(paciente.dataNascimento)),
+          informacao('NASCIMENTO', nascimentoComIdade()),
           const SizedBox(height: 16),
           informacao('CPF', formatarCpf(paciente.cpf)),
           const SizedBox(height: 16),
           informacao('ENDEREÇO', paciente.endereco),
           const SizedBox(height: 16),
           informacao('EMAIL', paciente.email),
+          const SizedBox(height: 16),
+          informacao(
+            'CLÍNICA',
+            paciente.clinicaId == null ? 'Avulso' : paciente.nomeClinica,
+          ),
         ],
       ),
     );
@@ -56,6 +61,13 @@ class InformacoesPerfilPaciente extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String nascimentoComIdade() {
+    final data = formatarData(paciente.dataNascimento);
+    final idade = paciente.idade();
+    if (data.isEmpty || idade == null) return data;
+    return '$data ($idade ${idade == 1 ? 'ano' : 'anos'})';
   }
 
   String formatarData(DateTime? data) {

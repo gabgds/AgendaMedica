@@ -1,3 +1,5 @@
+import 'package:pex/database/status_agendamento.dart';
+
 class Atendimento {
   const Atendimento({
     required this.id,
@@ -26,29 +28,15 @@ class Atendimento {
   final bool notaFiscalEmitida;
 
   bool get notaFiscalPendente =>
-      emitirNotaFiscal && status == 'Concluído' && !notaFiscalEmitida;
+      emitirNotaFiscal &&
+      status == StatusAgendamento.concluido &&
+      !notaFiscalEmitida;
 
   String get situacaoNotaFiscal {
     if (!emitirNotaFiscal) return 'Não solicitada';
     if (notaFiscalEmitida) return 'Emitida';
     if (notaFiscalPendente) return 'Pendente de emissão';
     return 'Aguardando conclusão do atendimento';
-  }
-
-  Atendimento copyWith({String? status, bool? notaFiscalEmitida}) {
-    return Atendimento(
-      id: id,
-      pacienteId: pacienteId,
-      clinicaId: clinicaId,
-      nomePaciente: nomePaciente,
-      nomeClinica: nomeClinica,
-      dataHora: dataHora,
-      sala: sala,
-      duracaoMinutos: duracaoMinutos,
-      status: status ?? this.status,
-      emitirNotaFiscal: emitirNotaFiscal,
-      notaFiscalEmitida: notaFiscalEmitida ?? this.notaFiscalEmitida,
-    );
   }
 
   String get horario {

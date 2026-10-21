@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pex/shared/atendimento/atendimento.dart';
-import 'package:pex/shared/atendimento/dados_em_memoria.dart';
+import 'package:pex/repositorios/agendamentos_repositorio.dart';
 import 'package:pex/shared/atendimento/modal_notas_fiscais.dart';
 import 'package:pex/shared/listagem/card_listagem.dart';
 
@@ -12,11 +12,8 @@ class AvisoNotasFiscais extends StatefulWidget {
 }
 
 class _AvisoNotasFiscaisState extends State<AvisoNotasFiscais> {
-  late final streamPendencias = observarDadosEmMemoria(consultarPendencias);
+  late final streamPendencias = observarNotasFiscais(apenasPendentes: true);
   bool modalAberto = false;
-
-  List<Atendimento> consultarPendencias() =>
-      notasFiscaisEmMemoria(apenasPendentes: true);
 
   Future<void> abrirPendencias() async {
     if (modalAberto) return;
@@ -32,7 +29,6 @@ class _AvisoNotasFiscaisState extends State<AvisoNotasFiscais> {
   Widget build(BuildContext context) {
     return StreamBuilder<List<Atendimento>>(
       stream: streamPendencias,
-      initialData: consultarPendencias(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Padding(

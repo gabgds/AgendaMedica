@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:pex/shared/botões/botao.dart';
 import '../clinica.dart';
 import 'package:pex/shared/formulario/campo_formulario.dart';
@@ -30,7 +29,6 @@ class _ModalClinicaState extends State<ModalClinica> {
   final chaveFormulario = GlobalKey<FormState>();
   final nomeController = TextEditingController();
   final enderecoController = TextEditingController();
-  final telefoneController = TextEditingController();
 
   @override
   void initState() {
@@ -39,14 +37,12 @@ class _ModalClinicaState extends State<ModalClinica> {
     if (clinica == null) return;
     nomeController.text = clinica.nome;
     enderecoController.text = clinica.endereco;
-    telefoneController.text = clinica.telefone.replaceAll(RegExp(r'\D'), '');
   }
 
   @override
   void dispose() {
     nomeController.dispose();
     enderecoController.dispose();
-    telefoneController.dispose();
     super.dispose();
   }
 
@@ -58,7 +54,6 @@ class _ModalClinicaState extends State<ModalClinica> {
       NovaClinica(
         nome: nomeController.text.trim(),
         endereco: enderecoController.text.trim(),
-        telefone: telefoneController.text.trim(),
       ),
     );
   }
@@ -89,22 +84,10 @@ class _ModalClinicaState extends State<ModalClinica> {
               compacto: true,
               controller: enderecoController,
               textCapitalization: TextCapitalization.words,
-              textInputAction: TextInputAction.next,
+              textInputAction: TextInputAction.done,
               validator: (valor) => (valor ?? '').trim().isEmpty
                   ? 'Digite o endereço'
                   : null,
-            ),
-            const SizedBox(height: 28),
-            FormInput(
-              'TELEFONE',
-              compacto: true,
-              controller: telefoneController,
-              teclado: TextInputType.phone,
-              textInputAction: TextInputAction.done,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(11),
-              ],
             ),
           ],
         ),

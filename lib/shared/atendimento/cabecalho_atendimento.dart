@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pex/database/status_agendamento.dart';
 import 'package:pex/shared/atendimento/atendimento.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 import 'package:pex/shared/funcoes/gerar_cor_avatar.dart';
@@ -38,7 +39,7 @@ class CabecalhoAtendimento extends StatelessWidget {
   }
 
   Widget etiquetaStatus() {
-    final concluido = atendimento.status == 'Concluído';
+    final concluido = atendimento.status == StatusAgendamento.concluido;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),

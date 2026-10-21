@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pex/repositorios/clinicas_repositorio.dart';
 import '../clinica.dart';
-import '../dados_clinicas_em_memoria.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
 import '../formulario_clinica/modal_clinica.dart';
 import 'acoes_perfil_clinica.dart';
@@ -41,15 +41,15 @@ class _ModalPerfilClinicaState extends State<ModalPerfilClinica> {
     try {
       final dados = await abrirModalClinica(context, clinicaInicial: clinica);
       if (!mounted || dados == null) return;
-      final atualizada = dados.paraClinica(id: clinica.id);
-      atualizarClinicaEmMemoria(atualizada);
+      final atualizada = await atualizarClinica(clinica.id, dados);
+      if (!mounted) return;
       setState(() => clinica = atualizada);
     } finally {
       acaoAberta = false;
     }
   }
 
-  Future<void> removerClinica() async {
+  Future<void> confirmarRemocao() async {
     if (acaoAberta) return;
     acaoAberta = true;
     try {
@@ -74,8 +74,13 @@ class _ModalPerfilClinicaState extends State<ModalPerfilClinica> {
         ),
       );
       if (!mounted || confirmado != true) return;
-      removerClinicaEmMemoria(clinica.id);
-      Navigator.pop(context);
+      await removerClinica(clinica.id);
+      if (mounted) Navigator.pop(context);
+    } on ClinicaComAgendamentos catch (erro) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(erro.toString())),
+      );
     } finally {
       acaoAberta = false;
     }
@@ -88,7 +93,7 @@ class _ModalPerfilClinicaState extends State<ModalPerfilClinica> {
       conteudo: InformacoesPerfilClinica(clinica: clinica),
       rodape: AcoesPerfilClinica(
         aoEditar: editarClinica,
-        aoRemover: removerClinica,
+        aoRemover: confirmarRemocao,
       ),
     );
   }

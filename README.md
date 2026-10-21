@@ -1,17 +1,31 @@
-# pex
+# Agenda Médica (PEX)
 
-A new Flutter project.
+Aplicativo Flutter para o médico organizar consultas, pacientes, clínicas e
+notas fiscais pendentes. Os dados ficam em um banco SQLite local (Drift).
 
-## Getting Started
+## Como rodar
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs  # após mudar tabelas
+flutter run
+flutter test
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Organização
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- `lib/database/app_database.dart`: tabelas do banco (segue o diagrama do grupo).
+  O arquivo `app_database.g.dart` é gerado pelo `build_runner`; não edite à mão.
+- `lib/database/banco.dart`: instância única do banco usada pelo app.
+- `lib/repositorios/`: consultas e gravações (médicos, clínicas, pacientes,
+  agendamentos e notas fiscais). As telas só falam com o banco por aqui.
+- `lib/shared/usuario/sessao.dart`: médico logado. Todas as consultas filtram
+  pelos dados desse médico.
+- `test/`: testes dos repositórios (banco em memória) e da interface.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Regras da nota fiscal
+
+1. Ao agendar, o médico informa se a consulta precisa de nota fiscal.
+2. Ao marcar a consulta como concluída, a nota fica **pendente** e aparece no
+   aviso da tela inicial.
+3. A pendência só sai quando o médico marca a nota como emitida.

@@ -1,40 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:pex/database/status_agendamento.dart';
+import 'package:pex/repositorios/agendamentos_repositorio.dart';
+import 'package:pex/repositorios/clinicas_repositorio.dart';
+import 'package:pex/repositorios/pacientes_repositorio.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
 import 'package:pex/paginas/agenda/formulario_agenda/modal_agendamento.dart';
-import 'package:pex/paginas/agenda/formulario_agenda/dados_agendamento_teste.dart';
 import 'package:pex/paginas/pacientes/paciente.dart';
-import 'package:pex/paginas/pacientes/dados_pacientes_em_memoria.dart';
-import 'package:pex/paginas/pacientes/dados_pacientes_teste.dart';
 import 'package:pex/paginas/pacientes/perfil_paciente/modal_perfil_paciente.dart';
 import 'acoes_atendimento.dart';
 import 'atendimento.dart';
 import 'cabecalho_atendimento.dart';
-import 'dados_em_memoria.dart';
 import 'informacoes_atendimento.dart';
 
 Future<void> abrirModalAtendimento(
   BuildContext context, {
   required Atendimento atendimento,
-  String? telefonePaciente,
 }) async {
   await abrirModalFormulario<void>(
     context,
-    builder: (context) => ModalAtendimento(
-      atendimento: atendimento,
-      telefonePaciente: telefonePaciente,
-    ),
+    builder: (context) => ModalAtendimento(atendimento: atendimento),
   );
 }
 
 class ModalAtendimento extends StatefulWidget {
-  const ModalAtendimento({
-    super.key,
-    required this.atendimento,
-    this.telefonePaciente,
-  });
+  const ModalAtendimento({super.key, required this.atendimento});
 
   final Atendimento atendimento;
-  final String? telefonePaciente;
 
   @override
   State<ModalAtendimento> createState() => _ModalAtendimentoState();
@@ -42,35 +33,31 @@ class ModalAtendimento extends StatefulWidget {
 
 class _ModalAtendimentoState extends State<ModalAtendimento> {
   bool acaoAberta = false;
-  late final streamAtendimento = observarDadosEmMemoria(
-    () => atendimentoAtual,
-  );
+  late final streamAtendimento = observarAtendimento(widget.atendimento.id);
+  late Atendimento atendimentoAtual = widget.atendimento;
 
-  Atendimento get atendimentoAtual =>
-      atendimentoPorIdEmMemoria(widget.atendimento.id) ?? widget.atendimento;
+  int? pacienteObservado;
+  Stream<Paciente?>? streamPaciente;
 
-  Paciente? obterPacienteAtual() {
-    for (final paciente in pacientesEmMemoria(pacientesTeste)) {
-      if (paciente.id == atendimentoAtual.pacienteId) return paciente;
+  Stream<Paciente?> observarPacienteAtual() {
+    if (pacienteObservado != atendimentoAtual.pacienteId) {
+      pacienteObservado = atendimentoAtual.pacienteId;
+      streamPaciente = observarPaciente(atendimentoAtual.pacienteId);
     }
-    return null;
+    return streamPaciente!;
   }
 
   Future<void> abrirPerfilPaciente() async {
     if (acaoAberta) return;
-    final paciente = obterPacienteAtual();
-    if (paciente == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Paciente não encontrado no cadastro.')),
-      );
-      return;
-    }
-
     acaoAberta = true;
     try {
-      await abrirModalPerfilPaciente(context, paciente: paciente);
+      final paciente = await buscarPaciente(atendimentoAtual.pacienteId);
       if (!mounted) return;
-      setState(() {});
+      if (paciente == null) {
+        mostrarMensagem('Paciente não encontrado no cadastro.');
+        return;
+      }
+      await abrirModalPerfilPaciente(context, paciente: paciente);
     } finally {
       acaoAberta = false;
     }
@@ -124,17 +111,19 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
   }
 
   Future<void> editarAtendimento() async {
-    if (acaoAberta || atendimentoAtual.status != 'Agendado') return;
+    if (acaoAberta || atendimentoAtual.status != StatusAgendamento.agendado) {
+      return;
+    }
     acaoAberta = true;
     try {
       final atendimento = atendimentoAtual;
-      final pacientes = <int, String>{...pacientesAgendamentoTeste};
-      final clinicas = <int, String>{...clinicasAgendamentoTeste};
-      pacientes.putIfAbsent(atendimento.pacienteId, () => atendimento.nomePaciente);
-      final clinicaId = atendimento.clinicaId;
-      if (clinicaId != null) {
-        clinicas.putIfAbsent(clinicaId, () => atendimento.nomeClinica);
-      }
+      final pacientes = {
+        for (final paciente in await listarPacientes()) paciente.id: paciente.nome,
+      };
+      final clinicas = {
+        for (final clinica in await listarClinicas()) clinica.id: clinica.nome,
+      };
+      if (!mounted) return;
 
       final dados = await abrirModalAgendamento(
         context,
@@ -145,16 +134,8 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
       );
       if (!mounted || dados == null) return;
 
-      final atualizado = atualizarAtendimentoEmMemoria(
-        id: atendimento.id,
-        pacienteId: dados.pacienteId,
-        clinicaId: dados.clinicaId,
-        nomePaciente: pacientes[dados.pacienteId]!,
-        nomeClinica: dados.clinicaId == null ? '' : clinicas[dados.clinicaId]!,
-        dataHora: dados.dataHora,
-        duracaoMinutos: dados.duracaoMinutos,
-        emitirNotaFiscal: dados.emitirNotaFiscal,
-      );
+      final atualizado = await atualizarAtendimento(atendimento.id, dados);
+      if (!mounted) return;
       mostrarMensagem(atualizado
           ? 'Agendamento atualizado.'
           : 'Não foi possível editar este agendamento.');
@@ -163,8 +144,10 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
     }
   }
 
-  Future<void> cancelarAtendimento() async {
-    if (acaoAberta || atendimentoAtual.status != 'Agendado') return;
+  Future<void> cancelarAtendimentoAtual() async {
+    if (acaoAberta || atendimentoAtual.status != StatusAgendamento.agendado) {
+      return;
+    }
     acaoAberta = true;
     try {
       final atendimento = atendimentoAtual;
@@ -177,7 +160,9 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
         destrutiva: true,
       );
       if (!mounted || !confirmado) return;
-      if (!cancelarAtendimentoEmMemoria(atendimento.id)) {
+      final cancelado = await cancelarAtendimento(atendimento.id);
+      if (!mounted) return;
+      if (!cancelado) {
         mostrarMensagem('Não foi possível cancelar este agendamento.');
         return;
       }
@@ -191,8 +176,10 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
     }
   }
 
-  Future<void> concluirAtendimento() async {
-    if (acaoAberta || atendimentoAtual.status != 'Agendado') return;
+  Future<void> concluirAtendimentoAtual() async {
+    if (acaoAberta || atendimentoAtual.status != StatusAgendamento.agendado) {
+      return;
+    }
     acaoAberta = true;
     try {
       final atendimento = atendimentoAtual;
@@ -207,11 +194,13 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
         textoCancelar: 'Voltar',
       );
       if (!mounted || !confirmado) return;
-      if (!concluirAtendimentoEmMemoria(atendimento.id)) {
+      final concluido = await concluirAtendimento(atendimento.id);
+      if (!mounted) return;
+      if (!concluido) {
         mostrarMensagem('Não foi possível concluir este atendimento.');
         return;
       }
-      mostrarMensagem(atendimentoAtual.notaFiscalPendente
+      mostrarMensagem(atendimento.emitirNotaFiscal
           ? 'Atendimento concluído. Nota fiscal pendente de emissão.'
           : 'Atendimento concluído.');
     } finally {
@@ -221,27 +210,29 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Atendimento>(
+    return StreamBuilder<Atendimento?>(
       stream: streamAtendimento,
       initialData: widget.atendimento,
       builder: (context, snapshot) {
-        final atendimento = snapshot.data ?? widget.atendimento;
-        final paciente = obterPacienteAtual();
+        atendimentoAtual = snapshot.data ?? atendimentoAtual;
+        final atendimento = atendimentoAtual;
         return ModalFormulario(
           titulo: 'Atendimento',
           cabecalhoPersonalizado: CabecalhoAtendimento(atendimento: atendimento),
-          conteudo: InformacoesAtendimento(
-            atendimento: atendimento,
-            telefonePaciente:
-                paciente?.telefoneFormatado ?? widget.telefonePaciente,
-            aoAbrirPerfilPaciente: abrirPerfilPaciente,
+          conteudo: StreamBuilder<Paciente?>(
+            stream: observarPacienteAtual(),
+            builder: (context, snapshotPaciente) => InformacoesAtendimento(
+              atendimento: atendimento,
+              telefonePaciente: snapshotPaciente.data?.telefoneFormatado,
+              aoAbrirPerfilPaciente: abrirPerfilPaciente,
+            ),
           ),
           rodape: AcoesAtendimento(
-            concluido: atendimento.status == 'Concluído',
-            cancelado: atendimento.status == 'Cancelado',
-            aoConcluir: concluirAtendimento,
+            concluido: atendimento.status == StatusAgendamento.concluido,
+            cancelado: atendimento.status == StatusAgendamento.cancelado,
+            aoConcluir: concluirAtendimentoAtual,
             aoEditar: editarAtendimento,
-            aoCancelar: cancelarAtendimento,
+            aoCancelar: cancelarAtendimentoAtual,
           ),
         );
       },

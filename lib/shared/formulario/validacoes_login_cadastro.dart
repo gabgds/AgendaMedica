@@ -6,6 +6,24 @@ String? validarNome(String? valor) {
   return null;
 }
 
+String? validarUsuario(String? valor) {
+  final usuario = (valor ?? '').trim();
+
+  if (usuario.isEmpty) {
+    return 'Digite seu usuário';
+  }
+
+  if (usuario.length < 3) {
+    return 'O usuário deve ter pelo menos 3 caracteres';
+  }
+
+  if (!RegExp(r'^[a-zA-Z0-9._-]+$').hasMatch(usuario)) {
+    return 'Use apenas letras, números, ponto, hífen ou _';
+  }
+
+  return null;
+}
+
 String? validarEmail(String? valor) {
   final email = (valor ?? '').trim();
 
