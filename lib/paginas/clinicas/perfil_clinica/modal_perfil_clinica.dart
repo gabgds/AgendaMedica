@@ -1,7 +1,11 @@
+import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/repositorios/clinicas_repositorio.dart';
+
 import '../clinica.dart';
+
 import 'package:pex/shared/formulario/modal_formulario.dart';
+
 import '../formulario_clinica/modal_clinica.dart';
 import 'acoes_perfil_clinica.dart';
 import 'informacoes_perfil_clinica.dart';
@@ -57,7 +61,12 @@ class _ModalPerfilClinicaState extends State<ModalPerfilClinica> {
         context: context,
         builder: (contextDialogo) => AlertDialog(
           title: const Text('Remover clínica?'),
-          content: Text('Deseja remover ${clinica.nome} da lista de clínicas?'),
+          content: Text(
+            'Deseja remover ${clinica.nome} da lista de clínicas? '
+            'Os cadastros dos pacientes serão mantidos. '
+            'Agendamentos cancelados não impedem a remoção. '
+            'Esta ação não pode ser desfeita.',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(contextDialogo, false),
@@ -78,9 +87,7 @@ class _ModalPerfilClinicaState extends State<ModalPerfilClinica> {
       if (mounted) Navigator.pop(context);
     } on ClinicaComAgendamentos catch (erro) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(erro.toString())),
-      );
+      mostrarAviso(context, erro.toString());
     } finally {
       acaoAberta = false;
     }

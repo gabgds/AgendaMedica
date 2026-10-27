@@ -1,11 +1,10 @@
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pex/database/app_database.dart';
 import 'package:pex/repositorios/medicos_repositorio.dart';
 import 'package:pex/shared/usuario/sessao.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqlite3/sqlite3.dart';
 import '../helpers/banco_teste.dart';
+import '../helpers/banco_antigo.dart';
 
 void main() {
   late AppDatabase bancoTeste;
@@ -44,8 +43,7 @@ void main() {
 
     final certo = await autenticarMedico(usuario: 'Carlos', senha: '123456');
     final errado = await autenticarMedico(usuario: 'carlos', senha: '000000');
-    final inexistente =
-        await autenticarMedico(usuario: 'ana', senha: '123456');
+    final inexistente = await autenticarMedico(usuario: 'ana', senha: '123456');
 
     expect(certo?.nome, 'A');
     expect(errado, isNull);
@@ -69,7 +67,8 @@ void main() {
       novaSenha: 'outra123',
     );
     expect(await autenticarMedico(usuario: 'novo', senha: '123456'), isNull);
-    expect(await autenticarMedico(usuario: 'novo', senha: 'outra123'), isNotNull);
+    expect(
+        await autenticarMedico(usuario: 'novo', senha: 'outra123'), isNotNull);
   });
 
   test('não permite trocar para o usuário de outro médico', () async {
@@ -115,12 +114,7 @@ void main() {
   });
 
   test('migra banco da versão 1, trocando email por usuario', () async {
-    final antigo = sqlite3.openInMemory()
-      ..execute('CREATE TABLE medicos (id INTEGER PRIMARY KEY AUTOINCREMENT, '
-          'nome TEXT NOT NULL, email TEXT NOT NULL UNIQUE, senha TEXT NOT NULL)')
-      ..execute("INSERT INTO medicos (nome, email, senha) VALUES ('A', 'carlos', 'x')")
-      ..execute('PRAGMA user_version = 1');
-    final migrado = AppDatabase.paraTeste(NativeDatabase.opened(antigo));
+    final migrado = abrirBancoAntigo(1);
     addTearDown(migrado.close);
 
     final medico = await migrado.select(migrado.medicos).getSingle();

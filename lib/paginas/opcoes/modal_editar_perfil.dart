@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pex/shared/botões/botao.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
 import 'package:pex/shared/usuario/perfil_usuario.dart';
+
 import 'campos_perfil.dart';
 import 'edicao_perfil.dart';
 
@@ -30,6 +31,7 @@ class _ModalEditarPerfilState extends State<ModalEditarPerfil> {
   final usuarioController = TextEditingController();
   final senhaController = TextEditingController();
   final confirmacaoController = TextEditingController();
+  bool confirmando = false;
 
   @override
   void initState() {
@@ -47,17 +49,43 @@ class _ModalEditarPerfilState extends State<ModalEditarPerfil> {
     super.dispose();
   }
 
-  void editarPerfil() {
+  Future<void> editarPerfil() async {
+    if (confirmando) return;
     if (!chaveFormulario.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
-    Navigator.pop(
-      context,
-      EdicaoPerfil(
+    confirmando = true;
+    try {
+      final edicao = EdicaoPerfil(
         nome: nomeController.text.trim(),
         usuario: usuarioController.text.trim(),
         novaSenha: senhaController.text.isEmpty ? null : senhaController.text,
-      ),
-    );
+      );
+      final confirmado = await showDialog<bool>(
+        context: context,
+        builder: (contextDialogo) => AlertDialog(
+          title: const Text('Salvar alterações do perfil?'),
+          content: const Text(
+            'Deseja salvar as alterações do seu perfil? '
+            'Se você alterou o usuário ou a senha, utilize os novos dados '
+            'no próximo acesso.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(contextDialogo, false),
+              child: const Text('Continuar editando'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(contextDialogo, true),
+              child: const Text('Sim, salvar'),
+            ),
+          ],
+        ),
+      );
+      if (!mounted || confirmado != true) return;
+      Navigator.pop(context, edicao);
+    } finally {
+      confirmando = false;
+    }
   }
 
   @override

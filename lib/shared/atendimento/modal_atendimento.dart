@@ -1,3 +1,4 @@
+import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/database/status_agendamento.dart';
 import 'package:pex/repositorios/agendamentos_repositorio.dart';
@@ -64,9 +65,7 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
   }
 
   void mostrarMensagem(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    mostrarAviso(context, mensagem);
   }
 
   String descreverAtendimento(Atendimento atendimento) {
@@ -118,7 +117,8 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
     try {
       final atendimento = atendimentoAtual;
       final pacientes = {
-        for (final paciente in await listarPacientes()) paciente.id: paciente.nome,
+        for (final paciente in await listarPacientes())
+          paciente.id: paciente.nome,
       };
       final clinicas = {
         for (final clinica in await listarClinicas()) clinica.id: clinica.nome,
@@ -166,11 +166,8 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
         mostrarMensagem('Não foi possível cancelar este agendamento.');
         return;
       }
-      final mensagens = ScaffoldMessenger.of(context);
+      mostrarAviso(context, 'Agendamento cancelado.');
       Navigator.pop(context);
-      mensagens.showSnackBar(
-        const SnackBar(content: Text('Agendamento cancelado.')),
-      );
     } finally {
       acaoAberta = false;
     }
@@ -218,7 +215,8 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
         final atendimento = atendimentoAtual;
         return ModalFormulario(
           titulo: 'Atendimento',
-          cabecalhoPersonalizado: CabecalhoAtendimento(atendimento: atendimento),
+          cabecalhoPersonalizado:
+              CabecalhoAtendimento(atendimento: atendimento),
           conteudo: StreamBuilder<Paciente?>(
             stream: observarPacienteAtual(),
             builder: (context, snapshotPaciente) => InformacoesAtendimento(

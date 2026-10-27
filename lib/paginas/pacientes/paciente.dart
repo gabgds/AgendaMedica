@@ -7,8 +7,6 @@ class Paciente {
     this.cpf = '',
     this.endereco = '',
     this.email = '',
-    this.clinicaId,
-    this.nomeClinica = '',
   });
 
   final int id;
@@ -18,8 +16,6 @@ class Paciente {
   final String cpf;
   final String endereco;
   final String email;
-  final int? clinicaId;
-  final String nomeClinica;
 
   String get telefoneFormatado {
     final numeros = telefone.replaceAll(RegExp(r'\D'), '');

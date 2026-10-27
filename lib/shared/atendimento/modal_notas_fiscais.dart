@@ -1,3 +1,4 @@
+import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/repositorios/agendamentos_repositorio.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
@@ -66,9 +67,7 @@ class _ModalNotasFiscaisState extends State<ModalNotasFiscais> {
       );
       if (!mounted || confirmado != true) return;
       if (!await marcarNotaFiscalEmitida(atendimento.id) || !mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nota fiscal marcada como emitida.')),
-      );
+      mostrarAviso(context, 'Nota fiscal marcada como emitida.');
     } finally {
       confirmandoEmissao = false;
     }
@@ -83,7 +82,8 @@ class _ModalNotasFiscaisState extends State<ModalNotasFiscais> {
   @override
   Widget build(BuildContext context) {
     return ModalFormulario(
-      titulo: widget.apenasPendentes ? 'Notas fiscais pendentes' : 'Notas fiscais',
+      titulo:
+          widget.apenasPendentes ? 'Notas fiscais pendentes' : 'Notas fiscais',
       conteudo: StreamBuilder<List<Atendimento>>(
         stream: streamNotas,
         builder: (context, snapshot) {
@@ -120,8 +120,8 @@ class _ModalNotasFiscaisState extends State<ModalNotasFiscais> {
     final cor = atendimento.notaFiscalPendente
         ? const Color(0xFFB25D15)
         : atendimento.notaFiscalEmitida
-        ? const Color(0xFF009691)
-        : const Color(0xFF757575);
+            ? const Color(0xFF009691)
+            : const Color(0xFF757575);
 
     return CardListagem(
       conteudo: Column(

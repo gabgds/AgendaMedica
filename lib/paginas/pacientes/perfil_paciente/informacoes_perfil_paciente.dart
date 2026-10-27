@@ -28,11 +28,6 @@ class InformacoesPerfilPaciente extends StatelessWidget {
           informacao('ENDEREÇO', paciente.endereco),
           const SizedBox(height: 16),
           informacao('EMAIL', paciente.email),
-          const SizedBox(height: 16),
-          informacao(
-            'CLÍNICA',
-            paciente.clinicaId == null ? 'Avulso' : paciente.nomeClinica,
-          ),
         ],
       ),
     );

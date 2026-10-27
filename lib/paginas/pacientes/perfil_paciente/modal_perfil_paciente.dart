@@ -1,9 +1,11 @@
+import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/repositorios/agendamentos_repositorio.dart';
 import 'package:pex/repositorios/pacientes_repositorio.dart';
 import 'package:pex/shared/atendimento/atendimento.dart';
 import 'package:pex/shared/atendimento/modal_notas_fiscais.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
+
 import '../paciente.dart';
 import '../formulario_paciente/modal_paciente.dart';
 import 'acoes_perfil_paciente.dart';
@@ -52,9 +54,7 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
   }
 
   void mostrarMensagem(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    mostrarAviso(context, mensagem);
   }
 
   Future<void> editarPaciente() async {
@@ -85,7 +85,10 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
           title: const Text('Remover paciente?'),
           content: Text(
             'Deseja remover ${paciente.nome} da lista de pacientes? '
-            'Os agendamentos deste paciente também serão removidos.',
+            'Agendamentos ativos ou notas fiscais pendentes impedem a remoção. '
+            'Se não houver esses impedimentos, o histórico de atendimentos e '
+            'notas fiscais deste paciente também será excluído. '
+            'Esta ação não pode ser desfeita.',
           ),
           actions: [
             TextButton(
@@ -106,6 +109,8 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
 
       await removerPaciente(paciente.id);
       if (mounted) Navigator.pop(context);
+    } on PacienteComAgendamentos catch (erro) {
+      if (mounted) mostrarMensagem(erro.toString());
     } on PacienteComNotaPendente catch (erro) {
       if (mounted) mostrarMensagem(erro.toString());
     } finally {

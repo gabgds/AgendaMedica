@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pex/paginas/clinicas/clinica.dart';
-import 'package:pex/repositorios/clinicas_repositorio.dart';
 import 'package:pex/shared/botões/botao.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
 import '../paciente.dart';
@@ -42,8 +40,6 @@ class _ModalPacienteState extends State<ModalPaciente> {
 
   DateTime? dataNascimento;
   bool escolhendoData = false;
-  int? clinicaId;
-  late final streamClinicas = observarClinicas();
 
   @override
   void initState() {
@@ -57,7 +53,6 @@ class _ModalPacienteState extends State<ModalPaciente> {
     emailController.text = paciente.email;
     telefoneController.text = paciente.telefone.replaceAll(RegExp(r'\D'), '');
     dataNascimento = paciente.dataNascimento;
-    clinicaId = paciente.clinicaId ?? 0;
     atualizarTextoData();
   }
 
@@ -123,7 +118,6 @@ class _ModalPacienteState extends State<ModalPaciente> {
         endereco: enderecoController.text.trim(),
         email: emailController.text.trim(),
         telefone: telefoneController.text.trim(),
-        clinicaId: clinicaId == 0 ? null : clinicaId,
       ),
     );
   }
@@ -136,23 +130,14 @@ class _ModalPacienteState extends State<ModalPaciente> {
       conteudo: Form(
         key: chaveFormulario,
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: StreamBuilder<List<Clinica>>(
-          stream: streamClinicas,
-          builder: (context, snapshot) => CamposPaciente(
-            nomeController: nomeController,
-            dataController: dataController,
-            cpfController: cpfController,
-            enderecoController: enderecoController,
-            emailController: emailController,
-            telefoneController: telefoneController,
-            escolherData: escolherData,
-            clinicas: {
-              for (final clinica in snapshot.data ?? <Clinica>[])
-                clinica.id: clinica.nome,
-            },
-            clinicaId: clinicaId,
-            aoSelecionarClinica: (id) => setState(() => clinicaId = id),
-          ),
+        child: CamposPaciente(
+          nomeController: nomeController,
+          dataController: dataController,
+          cpfController: cpfController,
+          enderecoController: enderecoController,
+          emailController: emailController,
+          telefoneController: telefoneController,
+          escolherData: escolherData,
         ),
       ),
       rodape: SizedBox(

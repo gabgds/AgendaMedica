@@ -12,6 +12,14 @@ class CpfJaCadastrado implements Exception {
   String toString() => 'Já existe um paciente com este CPF.';
 }
 
+class PacienteComAgendamentos implements Exception {
+  const PacienteComAgendamentos();
+
+  @override
+  String toString() =>
+      'Este paciente possui agendamentos ativos. Cancele-os antes de removê-lo.';
+}
+
 class PacienteComNotaPendente implements Exception {
   const PacienteComNotaPendente();
 
@@ -20,9 +28,7 @@ class PacienteComNotaPendente implements Exception {
       'Este paciente tem nota fiscal pendente. Registre a emissão antes de removê-lo.';
 }
 
-Paciente _paraPaciente(TypedResult linha) {
-  final paciente = linha.readTable(banco.pacientes);
-  final clinica = linha.readTableOrNull(banco.clinicas);
+Paciente _paraPaciente(PacienteRegistro paciente) {
   return Paciente(
     id: paciente.id,
     nome: paciente.nomeCompleto,
@@ -31,20 +37,13 @@ Paciente _paraPaciente(TypedResult linha) {
     cpf: paciente.cpf,
     endereco: paciente.endereco,
     email: paciente.email,
-    clinicaId: paciente.clinicaId,
-    nomeClinica: clinica?.nome ?? '',
   );
 }
 
-JoinedSelectStatement _consultaPacientes() {
-  return banco.select(banco.pacientes).join([
-    leftOuterJoin(
-      banco.clinicas,
-      banco.clinicas.id.equalsExp(banco.pacientes.clinicaId),
-    ),
-  ])
-    ..where(banco.pacientes.medicoId.equals(medicoLogadoId))
-    ..orderBy([OrderingTerm.asc(banco.pacientes.nomeCompleto)]);
+SimpleSelectStatement<Pacientes, PacienteRegistro> _consultaPacientes() {
+  return banco.select(banco.pacientes)
+    ..where((p) => p.medicoId.equals(medicoLogadoId))
+    ..orderBy([(p) => OrderingTerm.asc(p.nomeCompleto)]);
 }
 
 Stream<List<Paciente>> observarPacientes() {
@@ -56,8 +55,7 @@ Stream<List<Paciente>> observarPacientes() {
 Future<List<Paciente>> listarPacientes() => observarPacientes().first;
 
 Stream<Paciente?> observarPaciente(int id) {
-  final consulta = _consultaPacientes()
-    ..where(banco.pacientes.id.equals(id));
+  final consulta = _consultaPacientes()..where((p) => p.id.equals(id));
   return consulta.watchSingleOrNull().map(
         (linha) => linha == null ? null : _paraPaciente(linha),
       );
@@ -77,7 +75,6 @@ Future<Paciente> adicionarPaciente(NovoPaciente dados) async {
   final id = await banco.into(banco.pacientes).insert(
         PacientesCompanion.insert(
           medicoId: medicoLogadoId,
-          clinicaId: Value(dados.clinicaId),
           nomeCompleto: dados.nome,
           dataNascimento: dados.dataNascimento,
           cpf: dados.cpf,
@@ -94,7 +91,6 @@ Future<Paciente> atualizarPaciente(int id, NovoPaciente dados) async {
   await (banco.update(banco.pacientes)
         ..where((p) => p.id.equals(id) & p.medicoId.equals(medicoLogadoId)))
       .write(PacientesCompanion(
-    clinicaId: Value(dados.clinicaId),
     nomeCompleto: Value(dados.nome),
     dataNascimento: Value(dados.dataNascimento),
     cpf: Value(dados.cpf),
@@ -106,27 +102,50 @@ Future<Paciente> atualizarPaciente(int id, NovoPaciente dados) async {
 }
 
 Future<void> removerPaciente(int id) {
+  final medicoId = medicoLogadoId;
   return banco.transaction(() async {
+    final paciente = await (banco.select(banco.pacientes)
+          ..where((p) => p.id.equals(id) & p.medicoId.equals(medicoId)))
+        .getSingleOrNull();
+    if (paciente == null) return;
+
+    final ativos = await (banco.select(banco.agendamentos)
+          ..where(
+            (a) =>
+                a.pacienteId.equals(id) &
+                a.status.equals(StatusAgendamento.agendado),
+          )
+          ..limit(1))
+        .get();
+    if (ativos.isNotEmpty) throw const PacienteComAgendamentos();
+
     final pendentes = await (banco.select(banco.notasFiscais).join([
       innerJoin(
         banco.agendamentos,
-        banco.agendamentos.id.equalsExp(banco.notasFiscais.agendamentoId),
+        banco.agendamentos.id.equalsExp(
+          banco.notasFiscais.agendamentoId,
+        ),
       ),
     ])
-          ..where(banco.notasFiscais.pacienteId.equals(id) &
-              banco.notasFiscais.emitida.equals(false) &
-              banco.agendamentos.status.equals(StatusAgendamento.concluido)))
+          ..where(
+            banco.notasFiscais.pacienteId.equals(id) &
+                banco.notasFiscais.emitida.equals(false) &
+                banco.agendamentos.status.equals(StatusAgendamento.concluido),
+          ))
         .get();
     if (pendentes.isNotEmpty) throw const PacienteComNotaPendente();
 
-    await (banco.delete(banco.notasFiscais)
-          ..where((n) => n.pacienteId.equals(id)))
+    await (banco.delete(
+      banco.notasFiscais,
+    )..where((n) => n.pacienteId.equals(id)))
         .go();
-    await (banco.delete(banco.agendamentos)
-          ..where((a) => a.pacienteId.equals(id)))
+    await (banco.delete(
+      banco.agendamentos,
+    )..where((a) => a.pacienteId.equals(id)))
         .go();
-    await (banco.delete(banco.pacientes)
-          ..where((p) => p.id.equals(id) & p.medicoId.equals(medicoLogadoId)))
+    await (banco.delete(
+      banco.pacientes,
+    )..where((p) => p.id.equals(id) & p.medicoId.equals(medicoId)))
         .go();
   });
 }

@@ -1,3 +1,4 @@
+import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import '../shared/formulario/estilo_fonte_login.dart';
 import '../shared/formulario/campo_formulario.dart';
@@ -25,7 +26,6 @@ class _CadastroState extends State<Cadastro> {
     }
 
     cadastrando = true;
-    final mensagens = ScaffoldMessenger.of(context);
     try {
       await cadastrarMedico(
         nome: nomeController.text,
@@ -33,12 +33,10 @@ class _CadastroState extends State<Cadastro> {
         senha: senhaController.text,
       );
       if (!mounted) return;
+      mostrarAviso(context, 'Conta criada! Entre com seu usuário e senha.');
       Navigator.pop(context);
-      mensagens.showSnackBar(
-        const SnackBar(content: Text('Conta criada! Entre com seu usuário e senha.')),
-      );
     } on UsuarioJaCadastrado catch (erro) {
-      mensagens.showSnackBar(SnackBar(content: Text(erro.toString())));
+      if (mounted) mostrarAviso(context, erro.toString());
     } finally {
       cadastrando = false;
     }
@@ -58,8 +56,7 @@ class _CadastroState extends State<Cadastro> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading:
-        IconButton.filled(
+        leading: IconButton.filled(
           style: IconButton.styleFrom(
             backgroundColor: Colors.white,
             foregroundColor: Colors.black,
@@ -107,13 +104,9 @@ class _CadastroState extends State<Cadastro> {
           validator: validarSenhaCadastro,
         ),
         const SizedBox(height: 26),
-        FormInput(
-          'CONFIRMAR SENHA',
-          senha: true,
-          validator: (valor){
-            return confirmarSenha(valor, senhaController.text);
-          }
-        ),
+        FormInput('CONFIRMAR SENHA', senha: true, validator: (valor) {
+          return confirmarSenha(valor, senhaController.text);
+        }),
         const SizedBox(height: 26),
         Button('Criar conta', onPressed: cadastrar),
       ],

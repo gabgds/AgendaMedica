@@ -545,15 +545,6 @@ class $PacientesTable extends Pacientes
       requiredDuringInsert: true,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES medicos (id)'));
-  static const VerificationMeta _clinicaIdMeta =
-      const VerificationMeta('clinicaId');
-  @override
-  late final GeneratedColumn<int> clinicaId = GeneratedColumn<int>(
-      'clinica_id', aliasedName, true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES clinicas (id)'));
   static const VerificationMeta _nomeCompletoMeta =
       const VerificationMeta('nomeCompleto');
   @override
@@ -592,7 +583,6 @@ class $PacientesTable extends Pacientes
   List<GeneratedColumn> get $columns => [
         id,
         medicoId,
-        clinicaId,
         nomeCompleto,
         dataNascimento,
         cpf,
@@ -618,10 +608,6 @@ class $PacientesTable extends Pacientes
           medicoId.isAcceptableOrUnknown(data['medico_id']!, _medicoIdMeta));
     } else if (isInserting) {
       context.missing(_medicoIdMeta);
-    }
-    if (data.containsKey('clinica_id')) {
-      context.handle(_clinicaIdMeta,
-          clinicaId.isAcceptableOrUnknown(data['clinica_id']!, _clinicaIdMeta));
     }
     if (data.containsKey('nome_completo')) {
       context.handle(
@@ -680,8 +666,6 @@ class $PacientesTable extends Pacientes
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       medicoId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}medico_id'])!,
-      clinicaId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}clinica_id']),
       nomeCompleto: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}nome_completo'])!,
       dataNascimento: attachedDatabase.typeMapping.read(
@@ -707,7 +691,6 @@ class PacienteRegistro extends DataClass
     implements Insertable<PacienteRegistro> {
   final int id;
   final int medicoId;
-  final int? clinicaId;
   final String nomeCompleto;
   final DateTime dataNascimento;
   final String cpf;
@@ -717,7 +700,6 @@ class PacienteRegistro extends DataClass
   const PacienteRegistro(
       {required this.id,
       required this.medicoId,
-      this.clinicaId,
       required this.nomeCompleto,
       required this.dataNascimento,
       required this.cpf,
@@ -729,9 +711,6 @@ class PacienteRegistro extends DataClass
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['medico_id'] = Variable<int>(medicoId);
-    if (!nullToAbsent || clinicaId != null) {
-      map['clinica_id'] = Variable<int>(clinicaId);
-    }
     map['nome_completo'] = Variable<String>(nomeCompleto);
     map['data_nascimento'] = Variable<DateTime>(dataNascimento);
     map['cpf'] = Variable<String>(cpf);
@@ -745,9 +724,6 @@ class PacienteRegistro extends DataClass
     return PacientesCompanion(
       id: Value(id),
       medicoId: Value(medicoId),
-      clinicaId: clinicaId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(clinicaId),
       nomeCompleto: Value(nomeCompleto),
       dataNascimento: Value(dataNascimento),
       cpf: Value(cpf),
@@ -763,7 +739,6 @@ class PacienteRegistro extends DataClass
     return PacienteRegistro(
       id: serializer.fromJson<int>(json['id']),
       medicoId: serializer.fromJson<int>(json['medicoId']),
-      clinicaId: serializer.fromJson<int?>(json['clinicaId']),
       nomeCompleto: serializer.fromJson<String>(json['nomeCompleto']),
       dataNascimento: serializer.fromJson<DateTime>(json['dataNascimento']),
       cpf: serializer.fromJson<String>(json['cpf']),
@@ -778,7 +753,6 @@ class PacienteRegistro extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'medicoId': serializer.toJson<int>(medicoId),
-      'clinicaId': serializer.toJson<int?>(clinicaId),
       'nomeCompleto': serializer.toJson<String>(nomeCompleto),
       'dataNascimento': serializer.toJson<DateTime>(dataNascimento),
       'cpf': serializer.toJson<String>(cpf),
@@ -791,7 +765,6 @@ class PacienteRegistro extends DataClass
   PacienteRegistro copyWith(
           {int? id,
           int? medicoId,
-          Value<int?> clinicaId = const Value.absent(),
           String? nomeCompleto,
           DateTime? dataNascimento,
           String? cpf,
@@ -801,7 +774,6 @@ class PacienteRegistro extends DataClass
       PacienteRegistro(
         id: id ?? this.id,
         medicoId: medicoId ?? this.medicoId,
-        clinicaId: clinicaId.present ? clinicaId.value : this.clinicaId,
         nomeCompleto: nomeCompleto ?? this.nomeCompleto,
         dataNascimento: dataNascimento ?? this.dataNascimento,
         cpf: cpf ?? this.cpf,
@@ -813,7 +785,6 @@ class PacienteRegistro extends DataClass
     return PacienteRegistro(
       id: data.id.present ? data.id.value : this.id,
       medicoId: data.medicoId.present ? data.medicoId.value : this.medicoId,
-      clinicaId: data.clinicaId.present ? data.clinicaId.value : this.clinicaId,
       nomeCompleto: data.nomeCompleto.present
           ? data.nomeCompleto.value
           : this.nomeCompleto,
@@ -832,7 +803,6 @@ class PacienteRegistro extends DataClass
     return (StringBuffer('PacienteRegistro(')
           ..write('id: $id, ')
           ..write('medicoId: $medicoId, ')
-          ..write('clinicaId: $clinicaId, ')
           ..write('nomeCompleto: $nomeCompleto, ')
           ..write('dataNascimento: $dataNascimento, ')
           ..write('cpf: $cpf, ')
@@ -844,15 +814,14 @@ class PacienteRegistro extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(id, medicoId, clinicaId, nomeCompleto,
-      dataNascimento, cpf, endereco, email, telefone);
+  int get hashCode => Object.hash(id, medicoId, nomeCompleto, dataNascimento,
+      cpf, endereco, email, telefone);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is PacienteRegistro &&
           other.id == this.id &&
           other.medicoId == this.medicoId &&
-          other.clinicaId == this.clinicaId &&
           other.nomeCompleto == this.nomeCompleto &&
           other.dataNascimento == this.dataNascimento &&
           other.cpf == this.cpf &&
@@ -864,7 +833,6 @@ class PacienteRegistro extends DataClass
 class PacientesCompanion extends UpdateCompanion<PacienteRegistro> {
   final Value<int> id;
   final Value<int> medicoId;
-  final Value<int?> clinicaId;
   final Value<String> nomeCompleto;
   final Value<DateTime> dataNascimento;
   final Value<String> cpf;
@@ -874,7 +842,6 @@ class PacientesCompanion extends UpdateCompanion<PacienteRegistro> {
   const PacientesCompanion({
     this.id = const Value.absent(),
     this.medicoId = const Value.absent(),
-    this.clinicaId = const Value.absent(),
     this.nomeCompleto = const Value.absent(),
     this.dataNascimento = const Value.absent(),
     this.cpf = const Value.absent(),
@@ -885,7 +852,6 @@ class PacientesCompanion extends UpdateCompanion<PacienteRegistro> {
   PacientesCompanion.insert({
     this.id = const Value.absent(),
     required int medicoId,
-    this.clinicaId = const Value.absent(),
     required String nomeCompleto,
     required DateTime dataNascimento,
     required String cpf,
@@ -902,7 +868,6 @@ class PacientesCompanion extends UpdateCompanion<PacienteRegistro> {
   static Insertable<PacienteRegistro> custom({
     Expression<int>? id,
     Expression<int>? medicoId,
-    Expression<int>? clinicaId,
     Expression<String>? nomeCompleto,
     Expression<DateTime>? dataNascimento,
     Expression<String>? cpf,
@@ -913,7 +878,6 @@ class PacientesCompanion extends UpdateCompanion<PacienteRegistro> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (medicoId != null) 'medico_id': medicoId,
-      if (clinicaId != null) 'clinica_id': clinicaId,
       if (nomeCompleto != null) 'nome_completo': nomeCompleto,
       if (dataNascimento != null) 'data_nascimento': dataNascimento,
       if (cpf != null) 'cpf': cpf,
@@ -926,7 +890,6 @@ class PacientesCompanion extends UpdateCompanion<PacienteRegistro> {
   PacientesCompanion copyWith(
       {Value<int>? id,
       Value<int>? medicoId,
-      Value<int?>? clinicaId,
       Value<String>? nomeCompleto,
       Value<DateTime>? dataNascimento,
       Value<String>? cpf,
@@ -936,7 +899,6 @@ class PacientesCompanion extends UpdateCompanion<PacienteRegistro> {
     return PacientesCompanion(
       id: id ?? this.id,
       medicoId: medicoId ?? this.medicoId,
-      clinicaId: clinicaId ?? this.clinicaId,
       nomeCompleto: nomeCompleto ?? this.nomeCompleto,
       dataNascimento: dataNascimento ?? this.dataNascimento,
       cpf: cpf ?? this.cpf,
@@ -954,9 +916,6 @@ class PacientesCompanion extends UpdateCompanion<PacienteRegistro> {
     }
     if (medicoId.present) {
       map['medico_id'] = Variable<int>(medicoId.value);
-    }
-    if (clinicaId.present) {
-      map['clinica_id'] = Variable<int>(clinicaId.value);
     }
     if (nomeCompleto.present) {
       map['nome_completo'] = Variable<String>(nomeCompleto.value);
@@ -984,7 +943,6 @@ class PacientesCompanion extends UpdateCompanion<PacienteRegistro> {
     return (StringBuffer('PacientesCompanion(')
           ..write('id: $id, ')
           ..write('medicoId: $medicoId, ')
-          ..write('clinicaId: $clinicaId, ')
           ..write('nomeCompleto: $nomeCompleto, ')
           ..write('dataNascimento: $dataNascimento, ')
           ..write('cpf: $cpf, ')
@@ -2089,20 +2047,6 @@ final class $$ClinicasTableReferences
         manager.$state.copyWith(prefetchedData: [item]));
   }
 
-  static MultiTypedResultKey<$PacientesTable, List<PacienteRegistro>>
-      _pacientesRefsTable(_$AppDatabase db) =>
-          MultiTypedResultKey.fromTable(db.pacientes,
-              aliasName: 'clinicas__id__pacientes__clinica_id');
-
-  $$PacientesTableProcessedTableManager get pacientesRefs {
-    final manager = $$PacientesTableTableManager($_db, $_db.pacientes)
-        .filter((f) => f.clinicaId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_pacientesRefsTable($_db));
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: cache));
-  }
-
   static MultiTypedResultKey<$AgendamentosTable, List<AgendamentoRegistro>>
       _agendamentosRefsTable(_$AppDatabase db) =>
           MultiTypedResultKey.fromTable(db.agendamentos,
@@ -2154,27 +2098,6 @@ class $$ClinicasTableFilterComposer
                   $removeJoinBuilderFromRootComposer,
             ));
     return composer;
-  }
-
-  Expression<bool> pacientesRefs(
-      Expression<bool> Function($$PacientesTableFilterComposer f) f) {
-    final $$PacientesTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.pacientes,
-        getReferencedColumn: (t) => t.clinicaId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$PacientesTableFilterComposer(
-              $db: $db,
-              $table: $db.pacientes,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return f(composer);
   }
 
   Expression<bool> agendamentosRefs(
@@ -2276,27 +2199,6 @@ class $$ClinicasTableAnnotationComposer
     return composer;
   }
 
-  Expression<T> pacientesRefs<T extends Object>(
-      Expression<T> Function($$PacientesTableAnnotationComposer a) f) {
-    final $$PacientesTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.pacientes,
-        getReferencedColumn: (t) => t.clinicaId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$PacientesTableAnnotationComposer(
-              $db: $db,
-              $table: $db.pacientes,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return f(composer);
-  }
-
   Expression<T> agendamentosRefs<T extends Object>(
       Expression<T> Function($$AgendamentosTableAnnotationComposer a) f) {
     final $$AgendamentosTableAnnotationComposer composer = $composerBuilder(
@@ -2330,8 +2232,7 @@ class $$ClinicasTableTableManager extends RootTableManager<
     $$ClinicasTableUpdateCompanionBuilder,
     (ClinicaRegistro, $$ClinicasTableReferences),
     ClinicaRegistro,
-    PrefetchHooks Function(
-        {bool medicoId, bool pacientesRefs, bool agendamentosRefs})> {
+    PrefetchHooks Function({bool medicoId, bool agendamentosRefs})> {
   $$ClinicasTableTableManager(_$AppDatabase db, $ClinicasTable table)
       : super(TableManagerState(
           db: db,
@@ -2373,15 +2274,10 @@ class $$ClinicasTableTableManager extends RootTableManager<
                   ))
               .toList(),
           prefetchHooksCallback: (
-              {medicoId = false,
-              pacientesRefs = false,
-              agendamentosRefs = false}) {
+              {medicoId = false, agendamentosRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [
-                if (pacientesRefs) db.pacientes,
-                if (agendamentosRefs) db.agendamentos
-              ],
+              explicitlyWatchedTables: [if (agendamentosRefs) db.agendamentos],
               addJoins: <
                   T extends TableManagerState<
                       dynamic,
@@ -2410,19 +2306,6 @@ class $$ClinicasTableTableManager extends RootTableManager<
               },
               getPrefetchedDataCallback: (items) async {
                 return [
-                  if (pacientesRefs)
-                    await $_getPrefetchedData<ClinicaRegistro, $ClinicasTable,
-                            PacienteRegistro>(
-                        currentTable: table,
-                        referencedTable:
-                            $$ClinicasTableReferences._pacientesRefsTable(db),
-                        managerFromTypedResult: (p0) =>
-                            $$ClinicasTableReferences(db, table, p0)
-                                .pacientesRefs,
-                        referencedItemsForCurrentItem:
-                            (item, referencedItems) => referencedItems
-                                .where((e) => e.clinicaId == item.id),
-                        typedResults: items),
                   if (agendamentosRefs)
                     await $_getPrefetchedData<ClinicaRegistro, $ClinicasTable,
                             AgendamentoRegistro>(
@@ -2454,12 +2337,10 @@ typedef $$ClinicasTableProcessedTableManager = ProcessedTableManager<
     $$ClinicasTableUpdateCompanionBuilder,
     (ClinicaRegistro, $$ClinicasTableReferences),
     ClinicaRegistro,
-    PrefetchHooks Function(
-        {bool medicoId, bool pacientesRefs, bool agendamentosRefs})>;
+    PrefetchHooks Function({bool medicoId, bool agendamentosRefs})>;
 typedef $$PacientesTableCreateCompanionBuilder = PacientesCompanion Function({
   Value<int> id,
   required int medicoId,
-  Value<int?> clinicaId,
   required String nomeCompleto,
   required DateTime dataNascimento,
   required String cpf,
@@ -2470,7 +2351,6 @@ typedef $$PacientesTableCreateCompanionBuilder = PacientesCompanion Function({
 typedef $$PacientesTableUpdateCompanionBuilder = PacientesCompanion Function({
   Value<int> id,
   Value<int> medicoId,
-  Value<int?> clinicaId,
   Value<String> nomeCompleto,
   Value<DateTime> dataNascimento,
   Value<String> cpf,
@@ -2492,20 +2372,6 @@ final class $$PacientesTableReferences
     final manager = $$MedicosTableTableManager($_db, $_db.medicos)
         .filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_medicoIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: [item]));
-  }
-
-  static $ClinicasTable _clinicaIdTable(_$AppDatabase db) =>
-      db.clinicas.createAlias('pacientes__clinica_id__clinicas__id');
-
-  $$ClinicasTableProcessedTableManager? get clinicaId {
-    final $_column = $_itemColumn<int>('clinica_id');
-    if ($_column == null) return null;
-    final manager = $$ClinicasTableTableManager($_db, $_db.clinicas)
-        .filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_clinicaIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: [item]));
@@ -2583,26 +2449,6 @@ class $$PacientesTableFilterComposer
             $$MedicosTableFilterComposer(
               $db: $db,
               $table: $db.medicos,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-
-  $$ClinicasTableFilterComposer get clinicaId {
-    final $$ClinicasTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.clinicaId,
-        referencedTable: $db.clinicas,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$ClinicasTableFilterComposer(
-              $db: $db,
-              $table: $db.clinicas,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -2705,26 +2551,6 @@ class $$PacientesTableOrderingComposer
             ));
     return composer;
   }
-
-  $$ClinicasTableOrderingComposer get clinicaId {
-    final $$ClinicasTableOrderingComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.clinicaId,
-        referencedTable: $db.clinicas,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$ClinicasTableOrderingComposer(
-              $db: $db,
-              $table: $db.clinicas,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
 }
 
 class $$PacientesTableAnnotationComposer
@@ -2769,26 +2595,6 @@ class $$PacientesTableAnnotationComposer
             $$MedicosTableAnnotationComposer(
               $db: $db,
               $table: $db.medicos,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-
-  $$ClinicasTableAnnotationComposer get clinicaId {
-    final $$ClinicasTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.clinicaId,
-        referencedTable: $db.clinicas,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$ClinicasTableAnnotationComposer(
-              $db: $db,
-              $table: $db.clinicas,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -2852,10 +2658,7 @@ class $$PacientesTableTableManager extends RootTableManager<
     (PacienteRegistro, $$PacientesTableReferences),
     PacienteRegistro,
     PrefetchHooks Function(
-        {bool medicoId,
-        bool clinicaId,
-        bool agendamentosRefs,
-        bool notasFiscaisRefs})> {
+        {bool medicoId, bool agendamentosRefs, bool notasFiscaisRefs})> {
   $$PacientesTableTableManager(_$AppDatabase db, $PacientesTable table)
       : super(TableManagerState(
           db: db,
@@ -2869,7 +2672,6 @@ class $$PacientesTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int> medicoId = const Value.absent(),
-            Value<int?> clinicaId = const Value.absent(),
             Value<String> nomeCompleto = const Value.absent(),
             Value<DateTime> dataNascimento = const Value.absent(),
             Value<String> cpf = const Value.absent(),
@@ -2880,7 +2682,6 @@ class $$PacientesTableTableManager extends RootTableManager<
               PacientesCompanion(
             id: id,
             medicoId: medicoId,
-            clinicaId: clinicaId,
             nomeCompleto: nomeCompleto,
             dataNascimento: dataNascimento,
             cpf: cpf,
@@ -2891,7 +2692,6 @@ class $$PacientesTableTableManager extends RootTableManager<
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required int medicoId,
-            Value<int?> clinicaId = const Value.absent(),
             required String nomeCompleto,
             required DateTime dataNascimento,
             required String cpf,
@@ -2902,7 +2702,6 @@ class $$PacientesTableTableManager extends RootTableManager<
               PacientesCompanion.insert(
             id: id,
             medicoId: medicoId,
-            clinicaId: clinicaId,
             nomeCompleto: nomeCompleto,
             dataNascimento: dataNascimento,
             cpf: cpf,
@@ -2918,7 +2717,6 @@ class $$PacientesTableTableManager extends RootTableManager<
               .toList(),
           prefetchHooksCallback: (
               {medicoId = false,
-              clinicaId = false,
               agendamentosRefs = false,
               notasFiscaisRefs = false}) {
             return PrefetchHooks(
@@ -2948,16 +2746,6 @@ class $$PacientesTableTableManager extends RootTableManager<
                         $$PacientesTableReferences._medicoIdTable(db),
                     referencedColumn:
                         $$PacientesTableReferences._medicoIdTable(db).id,
-                  ) as T;
-                }
-                if (clinicaId) {
-                  state = state.withJoin(
-                    currentTable: table,
-                    currentColumn: table.clinicaId,
-                    referencedTable:
-                        $$PacientesTableReferences._clinicaIdTable(db),
-                    referencedColumn:
-                        $$PacientesTableReferences._clinicaIdTable(db).id,
                   ) as T;
                 }
 
@@ -3010,10 +2798,7 @@ typedef $$PacientesTableProcessedTableManager = ProcessedTableManager<
     (PacienteRegistro, $$PacientesTableReferences),
     PacienteRegistro,
     PrefetchHooks Function(
-        {bool medicoId,
-        bool clinicaId,
-        bool agendamentosRefs,
-        bool notasFiscaisRefs})>;
+        {bool medicoId, bool agendamentosRefs, bool notasFiscaisRefs})>;
 typedef $$AgendamentosTableCreateCompanionBuilder = AgendamentosCompanion
     Function({
   Value<int> id,

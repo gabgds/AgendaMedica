@@ -39,6 +39,22 @@ void main() {
       (await observarAtendimentosDoDia(data).first).map((a) => a.id).toList();
 
   group('agenda do dia', () {
+    test('o mesmo paciente pode ter consultas em clínicas diferentes',
+        () async {
+      final centro = await adicionarClinica(novaClinica(nome: 'Centro'));
+      final norte = await adicionarClinica(novaClinica(nome: 'Norte'));
+      final primeira = await agendar(hora: 9, clinicaId: centro.id);
+      final segunda = await agendar(hora: 15, clinicaId: norte.id);
+
+      final consultaCentro = (await buscarAtendimento(primeira))!;
+      final consultaNorte = (await buscarAtendimento(segunda))!;
+      expect(consultaCentro.pacienteId, paciente.id);
+      expect(consultaNorte.pacienteId, paciente.id);
+      expect(consultaCentro.clinicaId, centro.id);
+      expect(consultaNorte.clinicaId, norte.id);
+      expect(await listarPacientes(), hasLength(1));
+    });
+
     test('lista só o dia pedido, em ordem de horário', () async {
       final tarde = await agendar(hora: 16);
       final manha = await agendar(hora: 8);
@@ -192,7 +208,8 @@ void main() {
 
       final editado = await atualizarAtendimento(
         id,
-        novoAgendamento(pacienteId: paciente.id, dataHora: DateTime(2026, 9, 1)),
+        novoAgendamento(
+            pacienteId: paciente.id, dataHora: DateTime(2026, 9, 1)),
       );
       expect(editado, isFalse);
     });
@@ -201,7 +218,8 @@ void main() {
       final id = await agendar(nota: true);
       await cancelarAtendimento(id);
 
-      expect(await observarNotasFiscais(pacienteId: paciente.id).first, isEmpty);
+      expect(
+          await observarNotasFiscais(pacienteId: paciente.id).first, isEmpty);
     });
   });
 }
