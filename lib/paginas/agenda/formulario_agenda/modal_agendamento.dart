@@ -157,6 +157,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
         height: 50,
         child: Button(
           editando ? 'Salvar alterações' : 'Agendar consulta',
+          padding: EdgeInsets.zero,
           onPressed: salvar,
         ),
       ),
