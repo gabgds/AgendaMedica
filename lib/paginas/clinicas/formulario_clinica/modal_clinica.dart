@@ -49,7 +49,7 @@ class _ModalClinicaState extends State<ModalClinica> {
   void salvar() {
     if (!chaveFormulario.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
-    Navigator.pop(
+    fecharEtapaModal(
       context,
       NovaClinica(
         nome: nomeController.text.trim(),
@@ -85,9 +85,8 @@ class _ModalClinicaState extends State<ModalClinica> {
               controller: enderecoController,
               textCapitalization: TextCapitalization.words,
               textInputAction: TextInputAction.done,
-              validator: (valor) => (valor ?? '').trim().isEmpty
-                  ? 'Digite o endereço'
-                  : null,
+              validator: (valor) =>
+                  (valor ?? '').trim().isEmpty ? 'Digite o endereço' : null,
             ),
           ],
         ),

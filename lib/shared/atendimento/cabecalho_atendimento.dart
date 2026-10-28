@@ -1,3 +1,4 @@
+import 'package:pex/shared/formulario/modal_formulario.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/database/status_agendamento.dart';
 import 'package:pex/shared/atendimento/atendimento.dart';
@@ -31,7 +32,7 @@ class CabecalhoAtendimento extends StatelessWidget {
         IconButton(
           tooltip: 'Voltar',
           icon: const Icon(Icons.arrow_back, color: Color(0xFF9E9E9E)),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => fecharEtapaModal(context),
         ),
         etiquetaStatus(),
       ],
@@ -57,9 +58,8 @@ class CabecalhoAtendimento extends StatelessWidget {
   }
 
   Widget paciente() {
-    final clinica = atendimento.clinicaId == null
-        ? 'Avulso'
-        : atendimento.nomeClinica;
+    final clinica =
+        atendimento.clinicaId == null ? 'Avulso' : atendimento.nomeClinica;
 
     return Padding(
       padding: const EdgeInsets.only(left: 8),

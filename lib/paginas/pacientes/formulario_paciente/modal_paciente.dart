@@ -1,3 +1,4 @@
+import 'package:pex/shared/formulario/seletores_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/shared/botões/botao.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
@@ -86,7 +87,7 @@ class _ModalPacienteState extends State<ModalPaciente> {
       var inicial = dataNascimento ?? hoje;
       if (inicial.isBefore(primeiraData)) inicial = primeiraData;
       if (inicial.isAfter(hoje)) inicial = hoje;
-      final data = await showDatePicker(
+      final data = await abrirSeletorData(
         context: context,
         initialDate: inicial,
         firstDate: primeiraData,
@@ -109,7 +110,7 @@ class _ModalPacienteState extends State<ModalPaciente> {
     if (!chaveFormulario.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
 
-    Navigator.pop(
+    fecharEtapaModal(
       context,
       NovoPaciente(
         nome: nomeController.text.trim(),

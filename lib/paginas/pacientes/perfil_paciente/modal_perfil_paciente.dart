@@ -1,3 +1,4 @@
+import 'package:pex/shared/formulario/confirmacao_modal.dart';
 import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/repositorios/agendamentos_repositorio.dart';
@@ -79,36 +80,18 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
     if (acaoAberta) return;
     acaoAberta = true;
     try {
-      final confirmado = await showDialog<bool>(
-        context: context,
-        builder: (contextDialogo) => AlertDialog(
-          title: const Text('Remover paciente?'),
-          content: Text(
-            'Deseja remover ${paciente.nome} da lista de pacientes? '
-            'Agendamentos ativos ou notas fiscais pendentes impedem a remoção. '
-            'Se não houver esses impedimentos, o histórico de atendimentos e '
-            'notas fiscais deste paciente também será excluído. '
-            'Esta ação não pode ser desfeita.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(contextDialogo, false),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(contextDialogo, true),
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFFF3333),
-              ),
-              child: const Text('Remover'),
-            ),
-          ],
-        ),
+      final confirmado = await abrirConfirmacaoModal(
+        context,
+        titulo: 'Remover paciente?',
+        mensagem: 'Remover ${paciente.nome} e todo o histórico de atendimentos '
+            'e notas fiscais? Esta ação é irreversível.',
+        textoConfirmar: 'Remover',
+        destrutiva: true,
       );
       if (!mounted || confirmado != true) return;
 
       await removerPaciente(paciente.id);
-      if (mounted) Navigator.pop(context);
+      if (mounted) fecharEtapaModal(context);
     } on PacienteComAgendamentos catch (erro) {
       if (mounted) mostrarMensagem(erro.toString());
     } on PacienteComNotaPendente catch (erro) {

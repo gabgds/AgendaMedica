@@ -62,7 +62,8 @@ void main() {
       (tester) async {
     await tester.runAsync(() async {
       await entrarComoMedico();
-      final paciente = await adicionarPaciente(novoPaciente(nome: 'Maria Silva'));
+      final paciente =
+          await adicionarPaciente(novoPaciente(nome: 'Maria Silva'));
       final agora = DateTime.now();
       await adicionarAtendimento(novoAgendamento(
         pacienteId: paciente.id,
@@ -82,6 +83,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Marcar como concluído'));
     await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
     await tester.tap(find.text('Sim, concluir'));
     await aguardarBanco(tester);
 
@@ -93,10 +96,13 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Marcar como emitida'));
     await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
     await tester.tap(find.text('Sim, já foi emitida'));
     await aguardarBanco(tester);
 
-    expect(find.text('Nenhuma nota fiscal pendente de emissão.'), findsOneWidget);
+    expect(
+        find.text('Nenhuma nota fiscal pendente de emissão.'), findsOneWidget);
     await finalizar(tester);
   });
 }

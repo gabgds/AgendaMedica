@@ -1,3 +1,4 @@
+import 'package:pex/shared/formulario/confirmacao_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/shared/botões/botao.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
@@ -60,29 +61,16 @@ class _ModalEditarPerfilState extends State<ModalEditarPerfil> {
         usuario: usuarioController.text.trim(),
         novaSenha: senhaController.text.isEmpty ? null : senhaController.text,
       );
-      final confirmado = await showDialog<bool>(
-        context: context,
-        builder: (contextDialogo) => AlertDialog(
-          title: const Text('Salvar alterações do perfil?'),
-          content: const Text(
-            'Deseja salvar as alterações do seu perfil? '
-            'Se você alterou o usuário ou a senha, utilize os novos dados '
+      final confirmado = await abrirConfirmacaoModal(
+        context,
+        titulo: 'Salvar alterações do perfil?',
+        mensagem: 'Salvar as alterações? Use o novo usuário ou senha '
             'no próximo acesso.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(contextDialogo, false),
-              child: const Text('Continuar editando'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(contextDialogo, true),
-              child: const Text('Sim, salvar'),
-            ),
-          ],
-        ),
+        textoCancelar: 'Continuar editando',
+        textoConfirmar: 'Sim, salvar',
       );
       if (!mounted || confirmado != true) return;
-      Navigator.pop(context, edicao);
+      fecharEtapaModal(context, edicao);
     } finally {
       confirmando = false;
     }

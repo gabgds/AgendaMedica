@@ -1,3 +1,4 @@
+import 'package:pex/shared/formulario/confirmacao_modal.dart';
 import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/repositorios/clinicas_repositorio.dart';
@@ -57,34 +58,17 @@ class _ModalPerfilClinicaState extends State<ModalPerfilClinica> {
     if (acaoAberta) return;
     acaoAberta = true;
     try {
-      final confirmado = await showDialog<bool>(
-        context: context,
-        builder: (contextDialogo) => AlertDialog(
-          title: const Text('Remover clínica?'),
-          content: Text(
-            'Deseja remover ${clinica.nome} da lista de clínicas? '
-            'Os cadastros dos pacientes serão mantidos. '
-            'Agendamentos cancelados não impedem a remoção. '
-            'Esta ação não pode ser desfeita.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(contextDialogo, false),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(contextDialogo, true),
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFFF3333),
-              ),
-              child: const Text('Remover'),
-            ),
-          ],
-        ),
+      final confirmado = await abrirConfirmacaoModal(
+        context,
+        titulo: 'Remover clínica?',
+        mensagem: 'Remover ${clinica.nome}? Os pacientes serão mantidos. '
+            'Esta ação é irreversível.',
+        textoConfirmar: 'Remover',
+        destrutiva: true,
       );
       if (!mounted || confirmado != true) return;
       await removerClinica(clinica.id);
-      if (mounted) Navigator.pop(context);
+      if (mounted) fecharEtapaModal(context);
     } on ClinicaComAgendamentos catch (erro) {
       if (!mounted) return;
       mostrarAviso(context, erro.toString());

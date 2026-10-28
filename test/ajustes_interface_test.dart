@@ -11,6 +11,7 @@ import 'package:pex/repositorios/clinicas_repositorio.dart';
 import 'package:pex/repositorios/medicos_repositorio.dart';
 import 'package:pex/repositorios/pacientes_repositorio.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
+import 'package:pex/shared/formulario/confirmacao_modal.dart';
 import 'package:pex/shared/usuario/sessao.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -60,7 +61,8 @@ void main() {
     });
   }
 
-  testarInterface('aviso permanece acima de modais empilhados e de diálogo', (
+  testarInterface('aviso permanece acima do painel e do alerta de confirmação',
+      (
     tester,
   ) async {
     await tester.runAsync(entrarComoMedico);
@@ -78,10 +80,10 @@ void main() {
               conteudo: TextButton(
                 onPressed: () {
                   mostrarAviso(context, 'Aviso sobre os modais');
-                  showDialog<void>(
-                    context: context,
-                    builder: (context) =>
-                        const AlertDialog(title: Text('Diálogo aberto')),
+                  abrirConfirmacaoModal(
+                    context,
+                    titulo: 'Diálogo aberto',
+                    mensagem: 'Confirmar esta ação?',
                   );
                 },
                 child: const Text('Exibir aviso e diálogo'),
@@ -99,9 +101,90 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Diálogo aberto'), findsOneWidget);
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
     expect(find.text('Aviso sobre os modais').hitTestable(), findsOneWidget);
     expect(tester.getTopLeft(find.text('Aviso sobre os modais')).dy,
         lessThan(150));
+  });
+
+  testarInterface('atendimento, perfil e edição usam o mesmo painel',
+      (tester) async {
+    await tester.runAsync(() async {
+      await entrarComoMedico();
+      final paciente = await adicionarPaciente(novoPaciente());
+      final hoje = DateTime.now();
+      await adicionarAtendimento(novoAgendamento(
+        pacienteId: paciente.id,
+        dataHora: DateTime(hoje.year, hoje.month, hoje.day, 23, 59),
+      ));
+    });
+    await abrirApp(tester);
+    await tester.tap(find.text('23:59 - Maria Silva'));
+    await aguardarBanco(tester);
+    await tester.ensureVisible(find.text('Perfil do paciente'));
+    await tester.tap(find.text('Perfil do paciente'));
+    await aguardarBanco(tester);
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
+    await tester.tap(find.text('Remover paciente'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
+    await tester.tap(find.text('Cancelar'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('Remover paciente'), findsOneWidget);
+    await tester.tap(find.text('Editar paciente'));
+    await tester.pumpAndSettle();
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
+    await tester.enterText(
+        find.byType(TextFormField).first, 'Maria atualizada');
+    await tester.tap(find.text('Salvar alterações'));
+    await aguardarBanco(tester);
+    expect(find.text('Maria atualizada').hitTestable(), findsOneWidget);
+    await tester.tap(find.byTooltip('Voltar'));
+    await aguardarBanco(tester);
+    expect(find.text('23:59 - Maria atualizada').hitTestable(), findsOneWidget);
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
+    await tester.tap(find.byTooltip('Voltar'));
+    await tester.pumpAndSettle();
+    expect(find.byType(BottomSheet), findsNothing);
+  });
+
+  testarInterface('cancelar agendamento só executa após confirmar no alerta',
+      (tester) async {
+    late int id;
+    await tester.runAsync(() async {
+      await entrarComoMedico();
+      final paciente = await adicionarPaciente(novoPaciente());
+      final hoje = DateTime.now();
+      id = await adicionarAtendimento(novoAgendamento(
+        pacienteId: paciente.id,
+        dataHora: DateTime(hoje.year, hoje.month, hoje.day, 23, 59),
+      ));
+    });
+    await abrirApp(tester);
+    await tester.tap(find.text('23:59 - Maria Silva'));
+    await aguardarBanco(tester);
+    await tester.tap(find.text('Cancelar agendamento'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
+    expect((await tester.runAsync(() => buscarAtendimento(id)))!.status,
+        StatusAgendamento.agendado);
+    await tester.tap(find.text('Manter'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('Cancelar agendamento'), findsOneWidget);
+
+    await tester.tap(find.text('Cancelar agendamento'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Cancelar'));
+    await aguardarBanco(tester);
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.byType(BottomSheet), findsNothing);
+    expect((await tester.runAsync(() => buscarAtendimento(id)))!.status,
+        StatusAgendamento.cancelado);
   });
 
   testarInterface('aviso de login aparece acima do teclado', (tester) async {
@@ -152,6 +235,7 @@ void main() {
     await tester.tap(find.text('+ Novo'));
     await tester.pumpAndSettle();
     expect(find.text('Novo paciente'), findsOneWidget);
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
     expect(find.text('CLÍNICA'), findsNothing);
     expect(find.byType(DropdownButtonFormField<int>), findsNothing);
     await tester.tap(find.byTooltip('Voltar'));
@@ -162,6 +246,7 @@ void main() {
     expect(find.text('CLÍNICA'), findsNothing);
     await tester.tap(find.text('Editar paciente'));
     await tester.pumpAndSettle();
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
     expect(find.text('CLÍNICA'), findsNothing);
     expect(find.byType(DropdownButtonFormField<int>), findsNothing);
   });
@@ -183,6 +268,8 @@ void main() {
     await tester.tap(find.text('Remover paciente'));
     await tester.pumpAndSettle();
     expect(find.text('Remover paciente?'), findsOneWidget);
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
 
     await tester.tap(find.text('Cancelar'));
     await tester.pumpAndSettle();
@@ -275,6 +362,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Remover clínica'));
     await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
     await tester.tap(find.text('Cancelar'));
     await tester.pumpAndSettle();
     expect(await tester.runAsync(listarClinicas), hasLength(1));
@@ -308,10 +396,28 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Editar perfil'));
     await tester.pumpAndSettle();
     expect(find.text('Salvar alterações do perfil?'), findsOneWidget);
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
+    expect(find.byType(AlertDialog, skipOffstage: false), findsOneWidget);
     expect((await tester.runAsync(() => buscarMedico(id)))!.usuario, 'carlos');
 
     await tester.tap(find.text('Continuar editando'));
     await tester.pumpAndSettle();
+    expect(find.text('Dr. Carlos Silva'), findsOneWidget);
+    expect((await tester.runAsync(() => buscarMedico(id)))!.usuario, 'carlos');
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Editar perfil'));
+    await tester.pumpAndSettle();
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('Dr. Carlos Silva'), findsOneWidget);
+    expect(find.byType(BottomSheet, skipOffstage: false), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Editar perfil'));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(12, 12));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
     expect(find.text('Dr. Carlos Silva'), findsOneWidget);
     expect((await tester.runAsync(() => buscarMedico(id)))!.usuario, 'carlos');
 

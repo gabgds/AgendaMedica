@@ -1,3 +1,4 @@
+import 'package:pex/shared/formulario/seletores_modal.dart';
 import 'package:flutter/material.dart';
 
 class SeletorDias extends StatelessWidget {
@@ -13,12 +14,22 @@ class SeletorDias extends StatelessWidget {
   static const verde = Color(0xFF009B95);
   static const dias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   static const meses = [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro',
   ];
 
   Future<void> escolherData(BuildContext context) async {
-    final data = await showDatePicker(
+    final data = await abrirSeletorData(
       context: context,
       initialDate: dataSelecionada,
       firstDate: DateTime(2026),

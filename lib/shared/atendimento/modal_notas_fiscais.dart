@@ -1,3 +1,4 @@
+import 'package:pex/shared/formulario/confirmacao_modal.dart';
 import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/repositorios/agendamentos_repositorio.dart';
@@ -44,26 +45,13 @@ class _ModalNotasFiscaisState extends State<ModalNotasFiscais> {
     if (confirmandoEmissao) return;
     confirmandoEmissao = true;
     try {
-      final confirmado = await showDialog<bool>(
-        context: context,
-        builder: (contextDialogo) => AlertDialog(
-          title: const Text('Confirmar emissão'),
-          content: Text(
-            'A nota fiscal de ${atendimento.nomePaciente}, referente ao '
-            'atendimento de ${formatarData(atendimento.dataHora)} às '
-            '${atendimento.horario}, já foi emitida?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(contextDialogo, false),
-              child: const Text('Cancelar'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(contextDialogo, true),
-              child: const Text('Sim, já foi emitida'),
-            ),
-          ],
-        ),
+      final confirmado = await abrirConfirmacaoModal(
+        context,
+        titulo: 'Confirmar emissão',
+        mensagem: 'A nota fiscal de ${atendimento.nomePaciente} '
+            '(${formatarData(atendimento.dataHora)} às '
+            '${atendimento.horario}) já foi emitida?',
+        textoConfirmar: 'Sim, já foi emitida',
       );
       if (!mounted || confirmado != true) return;
       if (!await marcarNotaFiscalEmitida(atendimento.id) || !mounted) return;
