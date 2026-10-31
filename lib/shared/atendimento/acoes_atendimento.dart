@@ -1,3 +1,4 @@
+import 'package:pex/shared/formulario/modal_formulario.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/shared/botões/botao.dart';
 
@@ -50,7 +51,7 @@ class AcoesAtendimento extends StatelessWidget {
         corTexto: Colors.black,
         pesoTexto: FontWeight.normal,
         padding: EdgeInsets.zero,
-        onPressed: () => Navigator.pop(context),
+        onPressed: () => fecharEtapaModal(context),
       ),
     );
   }

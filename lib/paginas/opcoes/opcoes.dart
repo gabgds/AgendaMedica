@@ -1,3 +1,4 @@
+import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 import 'package:pex/repositorios/medicos_repositorio.dart';
@@ -38,14 +39,10 @@ class _OpcoesState extends State<Opcoes> {
       await entrarESalvarSessao(perfil);
       widget.aoEditarPerfil?.call(edicao);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Perfil atualizado.')),
-      );
+      mostrarAviso(context, 'Perfil atualizado.');
     } on UsuarioJaCadastrado catch (erro) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(erro.toString())),
-      );
+      mostrarAviso(context, erro.toString());
     } finally {
       modalAberto = false;
     }

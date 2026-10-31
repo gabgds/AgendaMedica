@@ -1,3 +1,4 @@
+import 'package:pex/shared/formulario/seletores_modal.dart';
 import 'package:flutter/material.dart';
 import '../../../shared/botões/botao.dart';
 import '../../../shared/formulario/modal_formulario.dart';
@@ -97,7 +98,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
     if (inicial.isBefore(primeiraData)) inicial = primeiraData;
     if (inicial.isAfter(ultimaData)) inicial = ultimaData;
 
-    final data = await showDatePicker(
+    final data = await abrirSeletorData(
       context: context,
       initialDate: inicial,
       firstDate: primeiraData,
@@ -113,7 +114,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
   }
 
   Future<void> escolherHorario() async {
-    final horario = await showTimePicker(
+    final horario = await abrirSeletorHorario(
       context: context,
       initialTime: horarioSelecionado ?? TimeOfDay.now(),
       helpText: 'Selecione o horário',
@@ -134,17 +135,22 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
     if (!chaveFormulario.currentState!.validate()) return;
     final horario = horarioSelecionado!;
 
-    Navigator.pop(context, NovoAgendamento(
-      pacienteId: pacienteId!,
-      clinicaId: clinicaId == 0 ? null : clinicaId,
-      dataHora: DateTime(
-        dataSelecionada.year, dataSelecionada.month, dataSelecionada.day,
-        horario.hour, horario.minute,
-      ),
-      duracaoMinutos: int.parse(duracaoController.text),
-      emitirNotaFiscal: emitirNotaFiscal!,
-      sala: clinicaId == 0 ? '' : salaController.text.trim(),
-    ));
+    fecharEtapaModal(
+        context,
+        NovoAgendamento(
+          pacienteId: pacienteId!,
+          clinicaId: clinicaId == 0 ? null : clinicaId,
+          dataHora: DateTime(
+            dataSelecionada.year,
+            dataSelecionada.month,
+            dataSelecionada.day,
+            horario.hour,
+            horario.minute,
+          ),
+          duracaoMinutos: int.parse(duracaoController.text),
+          emitirNotaFiscal: emitirNotaFiscal!,
+          sala: clinicaId == 0 ? '' : salaController.text.trim(),
+        ));
   }
 
   @override
@@ -157,6 +163,7 @@ class _ModalAgendamentoState extends State<ModalAgendamento> {
         height: 50,
         child: Button(
           editando ? 'Salvar alterações' : 'Agendar consulta',
+          padding: EdgeInsets.zero,
           onPressed: salvar,
         ),
       ),

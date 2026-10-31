@@ -1,3 +1,4 @@
+import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import '../shared/formulario/estilo_fonte_login.dart';
 import '../shared/formulario/campo_formulario.dart';
@@ -41,9 +42,7 @@ class _LoginState extends State<Login> {
       );
       if (!mounted) return;
       if (medico == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Usuário ou senha incorretos.')),
-        );
+        mostrarAviso(context, 'Usuário ou senha incorretos.');
         return;
       }
 
@@ -78,14 +77,12 @@ class _LoginState extends State<Login> {
         Center(child: LoginFontStyle('Bem-vindo')),
         Center(child: Subtitulo('Entre para continuar')),
         const SizedBox(height: 32),
-
         FormInput(
           'USUÁRIO',
           controller: usuarioController,
           validator: validarUsuario,
         ),
         const SizedBox(height: 22),
-
         FormInput(
           'SENHA',
           senha: true,
@@ -93,10 +90,8 @@ class _LoginState extends State<Login> {
           validator: validarSenha,
         ),
         const SizedBox(height: 22),
-
         Button('Entrar', onPressed: entrar),
         const SizedBox(height: 22),
-
         GestureDetector(
           onTap: () {
             Navigator.push(
@@ -105,8 +100,7 @@ class _LoginState extends State<Login> {
             );
           },
           child: Center(
-            child:
-              const Subtitulo('Criar conta'),
+            child: const Subtitulo('Criar conta'),
           ),
         ),
       ],

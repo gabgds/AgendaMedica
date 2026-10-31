@@ -1,7 +1,9 @@
+import 'package:pex/shared/formulario/confirmacao_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/shared/botões/botao.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
 import 'package:pex/shared/usuario/perfil_usuario.dart';
+
 import 'campos_perfil.dart';
 import 'edicao_perfil.dart';
 
@@ -30,6 +32,7 @@ class _ModalEditarPerfilState extends State<ModalEditarPerfil> {
   final usuarioController = TextEditingController();
   final senhaController = TextEditingController();
   final confirmacaoController = TextEditingController();
+  bool confirmando = false;
 
   @override
   void initState() {
@@ -47,17 +50,30 @@ class _ModalEditarPerfilState extends State<ModalEditarPerfil> {
     super.dispose();
   }
 
-  void editarPerfil() {
+  Future<void> editarPerfil() async {
+    if (confirmando) return;
     if (!chaveFormulario.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
-    Navigator.pop(
-      context,
-      EdicaoPerfil(
+    confirmando = true;
+    try {
+      final edicao = EdicaoPerfil(
         nome: nomeController.text.trim(),
         usuario: usuarioController.text.trim(),
         novaSenha: senhaController.text.isEmpty ? null : senhaController.text,
-      ),
-    );
+      );
+      final confirmado = await abrirConfirmacaoModal(
+        context,
+        titulo: 'Salvar alterações do perfil?',
+        mensagem: 'Salvar as alterações? Use o novo usuário ou senha '
+            'no próximo acesso.',
+        textoCancelar: 'Continuar editando',
+        textoConfirmar: 'Sim, salvar',
+      );
+      if (!mounted || confirmado != true) return;
+      fecharEtapaModal(context, edicao);
+    } finally {
+      confirmando = false;
+    }
   }
 
   @override

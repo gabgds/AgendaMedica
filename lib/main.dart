@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pex/shared/avisos/aviso.dart';
 import 'paginas/inicio.dart';
 import 'paginas/login.dart';
 import 'shared/usuario/sessao.dart';
@@ -20,6 +21,7 @@ class MinhaAgendaApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.teal,
       ),
+      builder: (context, child) => CamadaAvisos(child: child!),
       routes: {
         '/login': (context) => const TelaInicial(),
       },

@@ -29,7 +29,6 @@ class Clinicas extends Table {
 class Pacientes extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get medicoId => integer().references(Medicos, #id)();
-  IntColumn get clinicaId => integer().nullable().references(Clinicas, #id)();
   TextColumn get nomeCompleto => text()();
   DateTimeColumn get dataNascimento => dateTime()();
   TextColumn get cpf => text()();
@@ -74,20 +73,33 @@ LazyDatabase _openConnection() {
   });
 }
 
-@DriftDatabase(tables: [Medicos, Clinicas, Pacientes, Agendamentos, NotasFiscais])
+@DriftDatabase(
+    tables: [Medicos, Clinicas, Pacientes, Agendamentos, NotasFiscais])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   AppDatabase.paraTeste(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onUpgrade: (m, de, para) async {
-          if (de < 2) {
-            await m.renameColumn(medicos, 'email', medicos.usuario);
+          // A tabela de pacientes é recriada sem clinica_id. Desative as
+          // referências durante a cópia para preservar agendamentos e notas.
+          await customStatement('PRAGMA foreign_keys = OFF');
+          try {
+            await transaction(() async {
+              if (de < 2) {
+                await m.renameColumn(medicos, 'email', medicos.usuario);
+              }
+              if (de < 3) {
+                await m.alterTable(TableMigration(pacientes));
+              }
+            });
+          } finally {
+            await customStatement('PRAGMA foreign_keys = ON');
           }
         },
         beforeOpen: (detalhes) async {

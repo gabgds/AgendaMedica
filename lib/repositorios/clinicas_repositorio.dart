@@ -10,7 +10,7 @@ class ClinicaComAgendamentos implements Exception {
 
   @override
   String toString() =>
-      'Esta clínica possui agendamentos e não pode ser removida.';
+      'Esta clínica possui agendamentos não cancelados e não pode ser removida.';
 }
 
 Clinica _paraClinica(ClinicaRegistro linha) =>
@@ -45,17 +45,31 @@ Future<Clinica> atualizarClinica(int id, NovaClinica dados) async {
 }
 
 Future<void> removerClinica(int id) {
+  final medicoId = medicoLogadoId;
   return banco.transaction(() async {
+    final clinica = await (banco.select(banco.clinicas)
+          ..where((c) => c.id.equals(id) & c.medicoId.equals(medicoId)))
+        .getSingleOrNull();
+    if (clinica == null) return;
+
     final agendamentos = await (banco.select(banco.agendamentos)
-          ..where((a) => a.clinicaId.equals(id))
+          ..where(
+            (a) =>
+                a.clinicaId.equals(id) &
+                a.status.equals(StatusAgendamento.cancelado).not(),
+          )
           ..limit(1))
         .get();
     if (agendamentos.isNotEmpty) throw const ClinicaComAgendamentos();
 
-    await (banco.update(banco.pacientes)..where((p) => p.clinicaId.equals(id)))
-        .write(const PacientesCompanion(clinicaId: Value(null)));
-    await (banco.delete(banco.clinicas)
-          ..where((c) => c.id.equals(id) & c.medicoId.equals(medicoLogadoId)))
+    // Os cancelados permanecem no banco, sem impedir a exclusão da clínica
+    // nem deixar uma chave estrangeira apontando para um cadastro removido.
+    await (banco.update(banco.agendamentos)
+          ..where((a) => a.clinicaId.equals(id)))
+        .write(const AgendamentosCompanion(clinicaId: Value(null)));
+    await (banco.delete(
+      banco.clinicas,
+    )..where((c) => c.id.equals(id) & c.medicoId.equals(medicoId)))
         .go();
   });
 }

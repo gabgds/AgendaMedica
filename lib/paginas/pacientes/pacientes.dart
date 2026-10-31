@@ -1,3 +1,4 @@
+import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/shared/estilo/estilo_texto.dart';
 import 'package:pex/repositorios/pacientes_repositorio.dart';
@@ -45,9 +46,7 @@ class _PacientesState extends State<Pacientes> {
         await adicionarPaciente(novo);
       } on CpfJaCadastrado catch (erro) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(erro.toString())),
-        );
+        mostrarAviso(context, erro.toString());
       }
     } finally {
       cadastroAberto = false;

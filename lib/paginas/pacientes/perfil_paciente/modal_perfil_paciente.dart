@@ -1,9 +1,12 @@
+import 'package:pex/shared/formulario/confirmacao_modal.dart';
+import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/repositorios/agendamentos_repositorio.dart';
 import 'package:pex/repositorios/pacientes_repositorio.dart';
 import 'package:pex/shared/atendimento/atendimento.dart';
 import 'package:pex/shared/atendimento/modal_notas_fiscais.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
+
 import '../paciente.dart';
 import '../formulario_paciente/modal_paciente.dart';
 import 'acoes_perfil_paciente.dart';
@@ -52,9 +55,7 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
   }
 
   void mostrarMensagem(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    mostrarAviso(context, mensagem);
   }
 
   Future<void> editarPaciente() async {
@@ -79,33 +80,20 @@ class _ModalPerfilPacienteState extends State<ModalPerfilPaciente> {
     if (acaoAberta) return;
     acaoAberta = true;
     try {
-      final confirmado = await showDialog<bool>(
-        context: context,
-        builder: (contextDialogo) => AlertDialog(
-          title: const Text('Remover paciente?'),
-          content: Text(
-            'Deseja remover ${paciente.nome} da lista de pacientes? '
-            'Os agendamentos deste paciente também serão removidos.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(contextDialogo, false),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(contextDialogo, true),
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFFF3333),
-              ),
-              child: const Text('Remover'),
-            ),
-          ],
-        ),
+      final confirmado = await abrirConfirmacaoModal(
+        context,
+        titulo: 'Remover paciente?',
+        mensagem: 'Remover ${paciente.nome} e todo o histórico de atendimentos '
+            'e notas fiscais? Esta ação é irreversível.',
+        textoConfirmar: 'Remover',
+        destrutiva: true,
       );
       if (!mounted || confirmado != true) return;
 
       await removerPaciente(paciente.id);
-      if (mounted) Navigator.pop(context);
+      if (mounted) fecharEtapaModal(context);
+    } on PacienteComAgendamentos catch (erro) {
+      if (mounted) mostrarMensagem(erro.toString());
     } on PacienteComNotaPendente catch (erro) {
       if (mounted) mostrarMensagem(erro.toString());
     } finally {

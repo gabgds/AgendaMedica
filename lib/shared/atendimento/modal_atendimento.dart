@@ -1,3 +1,5 @@
+import 'package:pex/shared/formulario/confirmacao_modal.dart';
+import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import 'package:pex/database/status_agendamento.dart';
 import 'package:pex/repositorios/agendamentos_repositorio.dart';
@@ -64,9 +66,7 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
   }
 
   void mostrarMensagem(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    mostrarAviso(context, mensagem);
   }
 
   String descreverAtendimento(Atendimento atendimento) {
@@ -84,30 +84,14 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
     required String textoCancelar,
     bool destrutiva = false,
   }) async {
-    final confirmado = await showDialog<bool>(
-      context: context,
-      builder: (contextDialogo) => AlertDialog(
-        title: Text(titulo),
-        content: Text(mensagem),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(contextDialogo, false),
-            child: Text(textoCancelar),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(contextDialogo, true),
-            style: destrutiva
-                ? FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF3333),
-                    foregroundColor: Colors.white,
-                  )
-                : null,
-            child: Text(textoConfirmar),
-          ),
-        ],
-      ),
+    return abrirConfirmacaoModal(
+      context,
+      titulo: titulo,
+      mensagem: mensagem,
+      textoConfirmar: textoConfirmar,
+      textoCancelar: textoCancelar,
+      destrutiva: destrutiva,
     );
-    return confirmado == true;
   }
 
   Future<void> editarAtendimento() async {
@@ -118,7 +102,8 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
     try {
       final atendimento = atendimentoAtual;
       final pacientes = {
-        for (final paciente in await listarPacientes()) paciente.id: paciente.nome,
+        for (final paciente in await listarPacientes())
+          paciente.id: paciente.nome,
       };
       final clinicas = {
         for (final clinica in await listarClinicas()) clinica.id: clinica.nome,
@@ -152,9 +137,9 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
     try {
       final atendimento = atendimentoAtual;
       final confirmado = await confirmarAcao(
-        titulo: 'Cancelar?',
-        mensagem: 'Deseja cancelar o agendamento de '
-            '${descreverAtendimento(atendimento)}? ',
+        titulo: 'Cancelar agendamento?',
+        mensagem: 'Cancelar a consulta de '
+            '${descreverAtendimento(atendimento)}?',
         textoConfirmar: 'Cancelar',
         textoCancelar: 'Manter',
         destrutiva: true,
@@ -166,11 +151,8 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
         mostrarMensagem('Não foi possível cancelar este agendamento.');
         return;
       }
-      final mensagens = ScaffoldMessenger.of(context);
-      Navigator.pop(context);
-      mensagens.showSnackBar(
-        const SnackBar(content: Text('Agendamento cancelado.')),
-      );
+      mostrarAviso(context, 'Agendamento cancelado.');
+      fecharEtapaModal(context);
     } finally {
       acaoAberta = false;
     }
@@ -188,8 +170,8 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
           : '';
       final confirmado = await confirmarAcao(
         titulo: 'Concluir atendimento?',
-        mensagem: 'Deseja marcar o atendimento de '
-            '${descreverAtendimento(atendimento)} como concluído?$avisoNota',
+        mensagem: 'Concluir a consulta de '
+            '${descreverAtendimento(atendimento)}?$avisoNota',
         textoConfirmar: 'Sim, concluir',
         textoCancelar: 'Voltar',
       );
@@ -218,7 +200,8 @@ class _ModalAtendimentoState extends State<ModalAtendimento> {
         final atendimento = atendimentoAtual;
         return ModalFormulario(
           titulo: 'Atendimento',
-          cabecalhoPersonalizado: CabecalhoAtendimento(atendimento: atendimento),
+          cabecalhoPersonalizado:
+              CabecalhoAtendimento(atendimento: atendimento),
           conteudo: StreamBuilder<Paciente?>(
             stream: observarPacienteAtual(),
             builder: (context, snapshotPaciente) => InformacoesAtendimento(

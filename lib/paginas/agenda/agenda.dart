@@ -1,3 +1,4 @@
+import 'package:pex/shared/avisos/aviso.dart';
 import 'package:flutter/material.dart';
 import '../../shared/estilo/estilo_texto.dart';
 import 'package:pex/shared/atendimento/atendimento.dart';
@@ -35,16 +36,15 @@ class _AgendaState extends State<Agenda> {
 
   Future<void> agendarConsulta() async {
     final pacientes = {
-      for (final paciente in await listarPacientes()) paciente.id: paciente.nome,
+      for (final paciente in await listarPacientes())
+        paciente.id: paciente.nome,
     };
     final clinicas = {
       for (final clinica in await listarClinicas()) clinica.id: clinica.nome,
     };
     if (!mounted) return;
     if (pacientes.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cadastre um paciente antes de agendar.')),
-      );
+      mostrarAviso(context, 'Cadastre um paciente antes de agendar.');
       return;
     }
 
@@ -61,9 +61,7 @@ class _AgendaState extends State<Agenda> {
     if (!mounted) return;
 
     selecionarData(consulta.dataHora);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Consulta agendada')),
-    );
+    mostrarAviso(context, 'Consulta agendada');
   }
 
   void abrirAtendimento(Atendimento atendimento) {

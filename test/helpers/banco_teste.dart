@@ -21,7 +21,8 @@ Future<PerfilUsuario> entrarComoMedico({
   String nome = 'Dr. Carlos',
   String usuario = 'carlos',
 }) async {
-  final medico = await cadastrarMedico(nome: nome, usuario: usuario, senha: '123456');
+  final medico =
+      await cadastrarMedico(nome: nome, usuario: usuario, senha: '123456');
   iniciarSessao(medico);
   return medico;
 }
@@ -29,7 +30,6 @@ Future<PerfilUsuario> entrarComoMedico({
 NovoPaciente novoPaciente({
   String nome = 'Maria Silva',
   String cpf = '12345678901',
-  int? clinicaId,
 }) {
   return NovoPaciente(
     nome: nome,
@@ -38,7 +38,6 @@ NovoPaciente novoPaciente({
     endereco: 'Rua das Flores, 123',
     email: 'maria@exemplo.com',
     telefone: '47999998888',
-    clinicaId: clinicaId,
   );
 }
 
