@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'confirmacao_modal.dart';
@@ -86,62 +85,21 @@ Future<TimeOfDay?> abrirSeletorHorario({
 }) {
   return abrirModalFormulario<TimeOfDay>(
     context,
-    builder: (context) => _SeletorHorario(
-      inicial: initialTime,
-      titulo: helpText,
-      textoCancelar: cancelText,
-      textoConfirmar: confirmText,
-      rotulo: '$hourLabelText e $minuteLabelText',
-    ),
-  );
-}
+    builder: (context) {
+      final media = MediaQuery.of(context);
 
-class _SeletorHorario extends StatefulWidget {
-  const _SeletorHorario({
-    required this.inicial,
-    required this.titulo,
-    required this.textoCancelar,
-    required this.textoConfirmar,
-    required this.rotulo,
-  });
-
-  final TimeOfDay inicial;
-  final String titulo;
-  final String textoCancelar;
-  final String textoConfirmar;
-  final String rotulo;
-
-  @override
-  State<_SeletorHorario> createState() => _SeletorHorarioState();
-}
-
-class _SeletorHorarioState extends State<_SeletorHorario> {
-  late TimeOfDay horario = widget.inicial;
-  late final inicial = DateTime(2000, 1, 1, horario.hour, horario.minute);
-
-  @override
-  Widget build(BuildContext context) {
-    return ModalFormulario(
-      titulo: widget.titulo,
-      conteudo: Semantics(
-        label: widget.rotulo,
-        child: SizedBox(
-          height: 216,
-          child: CupertinoDatePicker(
-            mode: CupertinoDatePickerMode.time,
-            initialDateTime: inicial,
-            use24hFormat: true,
-            onDateTimeChanged: (data) =>
-                horario = TimeOfDay(hour: data.hour, minute: data.minute),
-          ),
+      return MediaQuery(
+        data: media.copyWith(alwaysUse24HourFormat: true),
+        child: TimePickerDialog(
+          initialTime: initialTime,
+          initialEntryMode: TimePickerEntryMode.dial,
+          helpText: helpText,
+          cancelText: cancelText,
+          confirmText: confirmText,
+          hourLabelText: hourLabelText,
+          minuteLabelText: minuteLabelText,
         ),
-      ),
-      rodape: AcoesEtapaModal(
-        textoCancelar: widget.textoCancelar,
-        textoConfirmar: widget.textoConfirmar,
-        aoCancelar: () => fecharEtapaModal(context),
-        aoConfirmar: () => fecharEtapaModal(context, horario),
-      ),
-    );
-  }
+      );
+    },
+  );
 }
