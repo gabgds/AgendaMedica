@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pex/shared/formulario/modal_formulario.dart';
@@ -100,7 +101,6 @@ void main() {
     await tester.tap(find.text('Próxima etapa'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Fechar painel'));
-    await tester.tap(find.byTooltip('Fechar painel'));
     await tester.pumpAndSettle();
     expect(find.byType(BottomSheet), findsNothing);
     expect(encerrado, isTrue);
@@ -125,11 +125,62 @@ void main() {
     await tester.tap(find.text('Escolher horário'));
     await tester.pumpAndSettle();
     painelUnico();
-    expect(find.byType(CupertinoDatePicker), findsOneWidget);
-    await tester.drag(
-        find.byType(ListWheelScrollView).first, const Offset(0, -32));
+    // O seletor atual usa o relógio circular do Material em formato 24 horas.
+    final seletorHorario = find.byType(TimePickerDialog);
+    expect(seletorHorario, findsOneWidget);
+    expect(
+      tester.widget<TimePickerDialog>(seletorHorario).initialEntryMode,
+      TimePickerEntryMode.dial,
+    );
+
+    // Seleciona 10:15 diretamente no mostrador circular de 24 horas.
+    // Evita alternar para a entrada por texto, que pode gerar overflow
+    // de layout em testes de widget com o espaço disponível do diálogo.
+    // A partir do Flutter 3.35, o TimePicker deixou de expor a chave
+    // 'time-picker-dial'. Localizamos o mostrador pelo widget interno _Dial
+    // e pegamos seu CustomPaint, que corresponde à área clicável do relógio.
+    final dial = find.descendant(
+      of: seletorHorario,
+      matching: find.byWidgetPredicate(
+        (widget) => widget.runtimeType.toString() == '_Dial',
+      ),
+    );
+    expect(dial, findsOneWidget);
+
+    final mostrador = find.descendant(
+      of: dial,
+      matching: find.byType(CustomPaint),
+    );
+    expect(mostrador, findsOneWidget);
+
+    final retanguloMostrador = tester.getRect(mostrador);
+    final centroMostrador = retanguloMostrador.center;
+    final raio = retanguloMostrador.shortestSide / 2 - 28.0;
+    final usaMaterial3 = Theme.of(tester.element(seletorHorario)).useMaterial3;
+
+    // No mostrador de 24h do Material 3, 10 fica no anel externo,
+    // na posição correspondente ao índice 10 de 12 posições.
+    // No Material 2, o mostrador apresenta horas pares; 10 é o índice 5.
+    final indiceHora = usaMaterial3 ? 10 : 5;
+    final anguloHora = math.pi / 2 - indiceHora * (2 * math.pi / 12);
+    await tester.tapAt(
+      centroMostrador +
+          Offset(raio * math.cos(anguloHora), -raio * math.sin(anguloHora)),
+    );
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Selecionar'));
+
+    // Depois da seleção da hora, o mostrador passa para os minutos.
+    // 15 minutos corresponde à posição de 3 horas (à direita do centro).
+    final retanguloMinutos = tester.getRect(mostrador);
+    final centroMinutos = retanguloMinutos.center;
+    final raioMinutos = retanguloMinutos.shortestSide / 2 - 28.0;
+    await tester.tapAt(centroMinutos + Offset(raioMinutos, 0));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.descendant(
+      of: seletorHorario,
+      matching: find.text('Selecionar'),
+    ));
     await tester.pumpAndSettle();
     expect(find.text('Horário: 10:15'), findsOneWidget);
     expect(find.text('Consulta de revisão'), findsOneWidget);
